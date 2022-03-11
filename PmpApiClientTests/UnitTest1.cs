@@ -16,7 +16,7 @@ public class UnitTest1
         ApiResponse<IEnumerable<Resource>>? response = PmpApiClient.GetResourcesApiResponse();
         Assert.NotNull(response);
 #pragma warning disable CS8602
-        ApiOperation<IEnumerable<Resource>> operation = response.Operation;
+        ApiResponse<IEnumerable<Resource>>.ApiOperation operation = response.Operation;
 #pragma warning restore CS8602
         Assert.Equal("GET RESOURCES", operation.Name);
         Assert.Equal("Success", operation.Result.Status);
