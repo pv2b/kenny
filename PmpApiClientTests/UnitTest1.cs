@@ -50,5 +50,18 @@ public class UnitTest1
         Assert.Equal("WebLogic Server", resources[2].Type);
         Assert.Equal(2, resources[2].NoOfAccounts);
 
-    }   
+    }
+
+    [Fact]
+    public void TestResourceAccountList()
+    {
+        ResourceAccountList resourceAccountList = PmpApiClient.GetResourceAccountList("303");
+
+        Assert.Equal("MS SQL server", resourceAccountList.Type);
+        Assert.Equal("sqlserver-1", resourceAccountList.DnsName);
+        Assert.Equal("http://sqlserver-1/", resourceAccountList.Url);
+
+        var account = resourceAccountList?.Accounts?.First();
+        Assert.Equal("308", account?.Id);
+    }
 }
