@@ -9,14 +9,11 @@ namespace PmpApiClientTests;
 
 public class UnitTest1
 {
+    BasePmpApiClient PmpApiClient = new PmpApiClientMock();
     [Fact]
-    public void TestApiResponse()
+    public void TestApiResponseSuccess()
     {
-        ApiResponse<IEnumerable<Resource>>? response;
-
-        using (FileStream fs = File.Open(@"json\resources1.json", FileMode.Open)) {
-            response = JsonSerializer.Deserialize<ApiResponse<IEnumerable<Resource>>>(fs);
-        }
+        ApiResponse<IEnumerable<Resource>>? response = PmpApiClient.GetResourcesApiResponse();
         Assert.NotNull(response);
 #pragma warning disable CS8602
         ApiOperation<IEnumerable<Resource>> operation = response.Operation;
@@ -30,14 +27,7 @@ public class UnitTest1
     [Fact]
     public void TestResources()
     {
-        ApiResponse<IEnumerable<Resource>>? response;
-        using (FileStream fs = File.Open(@"json\resources1.json", FileMode.Open)) {
-            response = JsonSerializer.Deserialize<ApiResponse<IEnumerable<Resource>>>(fs);
-        }
-        Assert.NotNull(response);
-#pragma warning disable CS8602
-        List<Resource> resources = response.Operation.Details.ToList();
-#pragma warning restore CS8602
+        List<Resource> resources = PmpApiClient.GetResources().ToList();
         Assert.NotNull(resources);
 
         Assert.Equal(3, resources.Count);
