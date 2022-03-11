@@ -10,7 +10,7 @@
 			"RESOURCE NAME": "MSSQL server",
 			"RESOURCE DESCRIPTION": "WebLogic Data source password",
 			"RESOURCE TYPE": "MS SQL server",
-			"DNS NAME": "sqlserver-l",
+			"DNS NAME": "sqlserver-1",
 			"PASSWORD POLICY": "Strong",
 			"DEPARTMENT": "SQL Server DBA",
 			"LOCATION": "Level 10",

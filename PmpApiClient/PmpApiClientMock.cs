@@ -14,4 +14,11 @@ public class PmpApiClientMock : BasePmpApiClient {
     override public ApiResponse<IEnumerable<Resource>>? GetResourcesApiResponse() {
         return DeserializeFromFile<ApiResponse<IEnumerable<Resource>>>(@"json\resources1.json");
     }
+
+    override public ApiResponse<ResourceAccountList>? GetResourceAccountListApiResponse(String resourceId) {
+        if (!resourceId.Equals("303")) {
+            throw new NotImplementedException();
+        }
+        return DeserializeFromFile<ApiResponse<ResourceAccountList>>(@"json\accounts1.json");
+    }
 }

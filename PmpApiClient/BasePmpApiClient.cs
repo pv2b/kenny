@@ -19,4 +19,15 @@ public abstract class BasePmpApiClient {
         return HandleApiResponse<IEnumerable<Resource>>(response);
     }
 
+    public abstract ApiResponse<ResourceAccountList>? GetResourceAccountListApiResponse(string resourceId);
+    public ResourceAccountList GetResourceAccountList(string resourceId) {
+        var response = GetResourceAccountListApiResponse(resourceId);
+        return HandleApiResponse<ResourceAccountList>(response);
+    }
+    public ResourceAccountList GetResourceAccountList(Resource resource) {
+        if (resource.Id == null) {
+            throw new Exception("Missing value for Id property");
+        }
+        return GetResourceAccountList(resource.Id);
+    }
 }
