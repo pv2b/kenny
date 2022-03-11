@@ -21,4 +21,11 @@ public class PmpApiClientMock : BasePmpApiClient {
         }
         return DeserializeFromFile<ApiResponse<ResourceAccountList>>(@"json\accounts1.json");
     }
+
+    override public ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId) {
+        if (!resourceId.Equals("303") || !accountId.Equals("307")) {
+            throw new NotImplementedException();
+        }
+        return DeserializeFromFile<ApiResponse<AccountPassword>>(@"json\password1.json");
+    }
 }
