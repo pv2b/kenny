@@ -1,0 +1,61 @@
+{
+	"operation": {
+		"name": "GET RESOURCE ACCOUNTLIST",
+		"result ": {
+			"status": "Success",
+			"message": "Resource details with account list fetched successfully"
+		},
+		"Details": {
+			"RESOURCE ID": "303",
+			"RESOURCE NAME": "MSSQL server",
+			"RESOURCE DESCRIPTION": "WebLogic Data source password",
+			"RESOURCE TYPE": "MS SQL server",
+			"DNS NAME": "sqlserver-l",
+			"PASSWORD POLICY": "Strong",
+			"DEPARTMENT": "SQL Server DBA",
+			"LOCATION": "Level 10",
+			"RESOURCE URL": "http://sqlserver-1/",
+			"RESOURCE OWNER": "admin",
+			"CUSTOM FIELD": [{
+					"CUSTOMFIELDVALUE": "78336298",
+					"CUSTOMFIELDTYPE": "Numeric",
+					"CUSTOMFIELDLABEL": "License No",
+					"CUSTOMFIELDCOLUMNNAME": "COLUMN_LONG1"
+				},
+				{
+					"CUSTOMFIELDVALUE": "Sep 10, 2013",
+					"CUSTOMFIELDTYPE": "Date",
+					"CUSTOMFIELDLABEL": "Installed Date",
+					"CUSTOMFIELDCOLUMNNAME": "COLUMN_DATE1"
+				},
+				{
+					"CUSTOMFIELDVALUE": "Tese123$*%%",
+					"CUSTOMFIELDTYPE": "Password",
+					"CUSTOMFIELDLABEL": "Resource Password",
+					"CUSTOMFIELDCOLUMNNAME": "COLUMN_SCHAR1"
+				},
+				{
+					"CUSTOMFIELDVALUE": "YES",
+					"CUSTOMFIELDTYPE": "Character",
+					"CUSTOMFIELDLABEL": "Secure Resource",
+					"CUSTOMFIELDCOLUMNNAME": "COLUMN_CHAR1"
+				}
+			],
+			"ACCOUNT LIST": [{
+					"ISFAVPASS": "false",
+					"ACCOUNT NAME": "sysdba",
+					"PASSWDID": "308",
+					"PASSWORD STATUS": "[In Use]",
+					"ACCOUNT ID": "308"
+				},
+				{
+					"ISFAVPASS": "false",
+					"ACCOUNT NAME": "system",
+					"PASSWDID": "307",
+					"PASSWORD STATUS": "*****",
+					"ACCOUNT ID": "307"
+				}
+			]
+		}
+	}
+}
