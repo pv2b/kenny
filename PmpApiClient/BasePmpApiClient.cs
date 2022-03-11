@@ -29,5 +29,20 @@ public abstract class BasePmpApiClient {
             throw new Exception("Missing value for Id property");
         }
         return GetResourceAccountList(resource.Id);
+   }
+
+    public abstract ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId);
+    public AccountPassword GetAccountPassword(string resourceId, string accountId) {
+        var response = GetAccountPasswordApiResponse(resourceId, accountId);
+        return HandleApiResponse<AccountPassword>(response);
     }
+    public AccountPassword GetAccountPassword(Resource resource, ResourceAccountList.Account account) {
+        if (resource.Id == null) {
+            throw new Exception("Missing value for resource Id property");
+        }
+        if (account.Id == null) {
+            throw new Exception("Missing value for account Id property");
+        }
+        return GetAccountPassword(resource.Id, account.Id);
+   }
 }

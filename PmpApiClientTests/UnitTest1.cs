@@ -64,4 +64,12 @@ public class UnitTest1
         var account = resourceAccountList?.Accounts?.First();
         Assert.Equal("308", account?.Id);
     }
-}
+
+    [Fact]
+    public void TestAccountPassword()
+    {
+        AccountPassword accountPassword = PmpApiClient.GetAccountPassword("303", "307");
+        string password = accountPassword.Password;
+
+        Assert.Equal("fqxdB7ded@4", password);
+    }}
