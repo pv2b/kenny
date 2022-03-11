@@ -1,7 +1,7 @@
 {
 	"operation": {
 		"name": "GET RESOURCE ACCOUNTLIST",
-		"result ": {
+		"result": {
 			"status": "Success",
 			"message": "Resource details with account list fetched successfully"
 		},
