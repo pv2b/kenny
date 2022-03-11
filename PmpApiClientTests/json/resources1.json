@@ -1,0 +1,32 @@
+{
+	"operation": {
+		"name": "GET RESOURCES",
+		"result": {
+			"status": "Success",
+			"message": "Resources fetched successfully"
+		},
+		"totalRows": 3,
+		"Details": [{
+				"RESOURCE DESCRIPTION": "CentOS Machine",
+				"RESOURCE NAME": "CentOS Machine",
+				"RESOURCE ID": "301",
+				"RESOURCE TYPE": "Linux",
+				"NOOFACCOUNTS": "3"
+			},
+			{
+				"RESOURCE DESCRIPTION": "Cisco IOS Device",
+				"RESOURCE NAME": "Cisco IOS Device",
+				"RESOURCE ID": "302",
+				"RESOURCE TYPE": "Cisco IOS",
+				"NOOFACCOUNTS": "2"
+			},
+			{
+				"RESOURCE DESCRIPTION": "Weblogic Data Source Password",
+				"RESOURCE NAME": "WebLogic Server",
+				"RESOURCE ID": "303",
+				"RESOURCE TYPE": "WebLogic Server",
+				"NOOFACCOUNTS": "2"
+			}
+		]
+	}
+}

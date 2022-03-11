@@ -24,4 +24,10 @@
     <ProjectReference Include="..\PmpApiClient\PmpApiClient.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="json\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>  
+
 </Project>
