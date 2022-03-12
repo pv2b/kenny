@@ -17,6 +17,7 @@ public class DynamicFolderController : ControllerBase
     [HttpGet(Name = "GetDynamicFolder")]
     public RoyalJsonDocument Get(string apiUser)
     {
+        var pmpApi = PmpApiClientStore.GetClient(apiUser);
         throw new NotImplementedException();
     }
 }
