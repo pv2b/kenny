@@ -15,8 +15,9 @@ public class DynamicCredentialController : ControllerBase
     }
 
     [HttpGet(Name = "GetDynamicCredential")]
-    public RoyalJsonDynamicCredential Get(string apiUser, string credentialId)
+    public Task<RoyalJsonDynamicCredential> Get(string apiUser, string credentialId)
     {
+        var pmpApi = PmpApiClientStore.GetClient(apiUser);
         throw new NotImplementedException();
     }
 }
