@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PmpApiClient", "PmpApiClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PmpApiClientTests", "PmpApiClientTests\PmpApiClientTests.csproj", "{D01889D3-7C69-44C7-8604-8D09E1BFB71E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KennyApi", "KennyApi\KennyApi.csproj", "{32B6FCA9-953A-47F7-926F-4ABE79C0B4B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{D01889D3-7C69-44C7-8604-8D09E1BFB71E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D01889D3-7C69-44C7-8604-8D09E1BFB71E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D01889D3-7C69-44C7-8604-8D09E1BFB71E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32B6FCA9-953A-47F7-926F-4ABE79C0B4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32B6FCA9-953A-47F7-926F-4ABE79C0B4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32B6FCA9-953A-47F7-926F-4ABE79C0B4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32B6FCA9-953A-47F7-926F-4ABE79C0B4B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
