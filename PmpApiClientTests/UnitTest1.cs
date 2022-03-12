@@ -11,9 +11,9 @@ public class UnitTest1
 {
     BasePmpApiClient PmpApiClient = new PmpApiClientMock();
     [Fact]
-    public void TestApiResponseSuccess()
+    public async void TestApiResponseSuccess()
     {
-        ApiResponse<IEnumerable<Resource>>? response = PmpApiClient.GetResourcesApiResponse();
+        ApiResponse<IEnumerable<Resource>>? response = await PmpApiClient.GetResourcesApiResponseAsync();
         Assert.NotNull(response);
 #pragma warning disable CS8602
         ApiResponse<IEnumerable<Resource>>.ApiOperation operation = response.Operation;
@@ -25,9 +25,9 @@ public class UnitTest1
     }
 
     [Fact]
-    public void TestResources()
+    public async void TestResources()
     {
-        List<Resource> resources = PmpApiClient.GetResources().ToList();
+        List<Resource> resources = (await PmpApiClient.GetResourcesAsync()).ToList();
         Assert.NotNull(resources);
 
         Assert.Equal(3, resources.Count);
@@ -53,9 +53,9 @@ public class UnitTest1
     }
 
     [Fact]
-    public void TestResourceAccountList()
+    public async void TestResourceAccountList()
     {
-        ResourceAccountList resourceAccountList = PmpApiClient.GetResourceAccountList("303");
+        ResourceAccountList resourceAccountList = await PmpApiClient.GetResourceAccountListAsync("303");
 
         Assert.Equal("MS SQL server", resourceAccountList.Type);
         Assert.Equal("sqlserver-1", resourceAccountList.DnsName);
@@ -66,9 +66,9 @@ public class UnitTest1
     }
 
     [Fact]
-    public void TestAccountPassword()
+    public async void TestAccountPassword()
     {
-        AccountPassword accountPassword = PmpApiClient.GetAccountPassword("303", "307");
+        AccountPassword accountPassword = await PmpApiClient.GetAccountPasswordAsync("303", "307");
         string password = accountPassword.Password;
 
         Assert.Equal("fqxdB7ded@4", password);
