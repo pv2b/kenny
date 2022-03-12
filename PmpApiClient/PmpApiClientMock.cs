@@ -3,29 +3,29 @@ using System.IO;
 using System.Text.Json;
 
 public class PmpApiClientMock : BasePmpApiClient {
-    private T? DeserializeFromFile<T>(String filename) {
+    private async Task<T?> DeserializeFromFileAsync<T>(String filename) {
         T? response;
         using (FileStream fs = File.Open(filename, FileMode.Open)) {
-            response = JsonSerializer.Deserialize<T>(fs);
+            response = await JsonSerializer.DeserializeAsync<T>(fs);
         }
         return response;
     }
 
-    override public ApiResponse<IEnumerable<Resource>>? GetResourcesApiResponse() {
-        return DeserializeFromFile<ApiResponse<IEnumerable<Resource>>>(@"json\resources1.json");
+    override public Task<ApiResponse<IEnumerable<Resource>>?> GetResourcesApiResponseAsync() {
+        return DeserializeFromFileAsync<ApiResponse<IEnumerable<Resource>>>(@"json\resources1.json");
     }
 
-    override public ApiResponse<ResourceAccountList>? GetResourceAccountListApiResponse(String resourceId) {
+    override public Task<ApiResponse<ResourceAccountList>?> GetResourceAccountListApiResponseAsync(String resourceId) {
         if (!resourceId.Equals("303")) {
             throw new NotImplementedException();
         }
-        return DeserializeFromFile<ApiResponse<ResourceAccountList>>(@"json\accounts1.json");
+        return DeserializeFromFileAsync<ApiResponse<ResourceAccountList>>(@"json\accounts1.json");
     }
 
-    override public ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {
+    override public Task<ApiResponse<AccountPassword>?> GetAccountPasswordApiResponseAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {
         if (!resourceId.Equals("303") || !accountId.Equals("307")) {
             throw new NotImplementedException();
         }
-        return DeserializeFromFile<ApiResponse<AccountPassword>>(@"json\password1.json");
+        return DeserializeFromFileAsync<ApiResponse<AccountPassword>>(@"json\password1.json");
     }
 }
