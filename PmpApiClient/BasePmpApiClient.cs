@@ -31,9 +31,11 @@ public abstract class BasePmpApiClient {
         return GetResourceAccountList(resource.Id);
    }
 
-    public abstract ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId, string? reason = null, string? ticketId = null);
+    public abstract ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request);
     public AccountPassword GetAccountPassword(string resourceId, string accountId, string? reason = null, string? ticketId = null) {
-        var response = GetAccountPasswordApiResponse(resourceId, accountId, reason, ticketId);
+        var passwordRequestDetails = new PasswordRequestDetails(reason, ticketId);
+        var request = new ApiRequest<PasswordRequestDetails>(passwordRequestDetails);
+        var response = GetAccountPasswordApiResponse(resourceId, accountId, request);
         return HandleApiResponse<AccountPassword>(response);
     }
     public AccountPassword GetAccountPassword(Resource resource, ResourceAccountList.Account account, string? reason = null, string? ticketId = null) {
