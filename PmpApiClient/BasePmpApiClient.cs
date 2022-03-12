@@ -31,18 +31,18 @@ public abstract class BasePmpApiClient {
         return GetResourceAccountList(resource.Id);
    }
 
-    public abstract ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId);
-    public AccountPassword GetAccountPassword(string resourceId, string accountId) {
-        var response = GetAccountPasswordApiResponse(resourceId, accountId);
+    public abstract ApiResponse<AccountPassword>? GetAccountPasswordApiResponse(string resourceId, string accountId, string? reason = null, string? ticketId = null);
+    public AccountPassword GetAccountPassword(string resourceId, string accountId, string? reason = null, string? ticketId = null) {
+        var response = GetAccountPasswordApiResponse(resourceId, accountId, reason, ticketId);
         return HandleApiResponse<AccountPassword>(response);
     }
-    public AccountPassword GetAccountPassword(Resource resource, ResourceAccountList.Account account) {
+    public AccountPassword GetAccountPassword(Resource resource, ResourceAccountList.Account account, string? reason = null, string? ticketId = null) {
         if (resource.Id == null) {
             throw new Exception("Missing value for resource Id property");
         }
         if (account.Id == null) {
             throw new Exception("Missing value for account Id property");
         }
-        return GetAccountPassword(resource.Id, account.Id);
+        return GetAccountPassword(resource.Id, account.Id, reason, ticketId);
    }
 }
