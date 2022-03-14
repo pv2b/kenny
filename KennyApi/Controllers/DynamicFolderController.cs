@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RoyalJson;
 
 namespace KennyApi.Controllers;
 
@@ -15,7 +14,7 @@ public class DynamicFolderController : ControllerBase
     }
 
     [HttpGet(Name = "GetDynamicFolder")]
-    public RoyalJsonDocument Get(string apiUser)
+    public Object Get(string apiUser)
     {
         var pmpApi = PmpApiClientStore.GetClient(apiUser);
         throw new NotImplementedException();
