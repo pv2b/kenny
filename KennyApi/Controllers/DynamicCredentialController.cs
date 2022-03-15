@@ -15,10 +15,10 @@ public class DynamicCredentialController : ControllerBase
     }
 
     [HttpGet(Name = "GetDynamicCredential")]
-    public async Task<Object> Get(string apiUser, string resourceId, string accountId)
+    public async Task<Object> Get(string collection, string resourceId, string accountId)
     {
-        var pmpApi = PmpApiClientStore.GetClient(apiUser);
-        string reason = "Requested through kenny";
+        var pmpApi = Globals.ApiKeyring.GetApiClient(HttpContext.User, collection);
+        string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
         var accountPassword = await pmpApi.GetAccountPasswordAsync(resourceId, accountId, reason);
         return new {
             Password = accountPassword.Password

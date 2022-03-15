@@ -37,9 +37,9 @@ public class DynamicFolderController : ControllerBase
     }
 
     [HttpGet(Name = "GetDynamicFolder")]
-    public async Task<Object> Get(string apiUser)
+    public async Task<Object> Get(string collection)
     {
-        var pmpApi = PmpApiClientStore.GetClient(apiUser);
+        var pmpApi = Globals.ApiKeyring.GetApiClient(HttpContext.User, collection);
         IEnumerable<(Resource, Task<ResourceAccountList>)> resources = await pmpApi.GetAllResourceAccountListAsync();
         var objects = new List<Object>();
         foreach (var (resource, resourceAccountListTask) in resources) {
