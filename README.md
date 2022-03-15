@@ -146,3 +146,26 @@ are empty or missing, nobody is allowed in. (I.e. there's no default
 
 Note that JSON requires backslashes to be escaped by doubling them inside
 strings.
+
+## Royal TS Configuration
+
+Add a dynamic folder with the following Dynamic Folder Script (Powershell):
+
+    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri https://kenny.contoso.com:5000/DynamicFolder?collection=contoso).Content
+
+... and the following Dynamic Credential Script (Powershell):
+
+    $ResourceId = @'
+    $Target.CustomField1$
+    '@
+
+    $CredentialId = @'
+    $DynamicCredential.EffectiveID$
+    '@
+
+    $AccountId = $CredentialId -replace "^PmpCred_", ""
+
+    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?collection=contoso&resourceId=$ResourceId&accountId=$AccountId").Content
+
+You will need to edit the script to edit the hostname of the Kenny server and
+the collection name.
