@@ -35,12 +35,12 @@ public class ApiKeyring {
                 throw new Exception($"ApiAuthToken is not set for {item.Key}");
     }
 
-    private void EnsureAuthorizedUser(ClaimsPrincipal user, Item item) {
+    private bool IsAuthorizedUser(ClaimsPrincipal user, Item item) {
         if (user.Identity == null || !user.Identity.IsAuthenticated)
-            throw new UnauthorizedAccessException();
+            return false;
 
         if (user.Identity.Name == null)
-            throw new UnauthorizedAccessException();
+            return false;
 
         string username = user.Identity.Name;
 
@@ -48,34 +48,35 @@ public class ApiKeyring {
         if (item.DenyUsers != null)
             foreach (string denyUser in item.DenyUsers)
                 if (String.Equals(username, denyUser, StringComparison.OrdinalIgnoreCase))
-                    throw new UnauthorizedAccessException();
+                    return false;
 
         /* Check if user is in deny group */
         if (item.DenyGroups != null)
             foreach (string denyGroup in item.DenyGroups)
                 if (user.IsInRole(denyGroup))
-                    throw new UnauthorizedAccessException();
+                    return false;
 
         /* Check if user is in allow list */
         if (item.AllowUsers != null)
             foreach (string allowUser in item.AllowUsers)
                 if (String.Equals(username, allowUser, StringComparison.OrdinalIgnoreCase))
-                    return;
+                    return true;
 
         /* Check if user is in allow group */
         if (item.AllowGroups != null)
             foreach (string allowGroup in item.AllowGroups)
                 if (user.IsInRole(allowGroup))
-                    return;
+                    return true;
 
         /* User was not authorized in the allow list or group */
-        throw new UnauthorizedAccessException();
+        return false;
     }
 
     public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
         Item item = _keyring[collection];
         
-        EnsureAuthorizedUser(user, item);
+        if (!IsAuthorizedUser(user, item))
+            throw new UnauthorizedAccessException();
         /* loader ensures these aren't null */
         #pragma warning disable CS8604 
         return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
