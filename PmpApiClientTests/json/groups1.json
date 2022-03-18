@@ -1,0 +1,1 @@
+{ "operation": { "result":{ "message":"Associated groups fetched successfully","status":"Success"}, "Details":{ "ASSOCIATED GROUPS":[{ "GROUP ID":301,"GROUP NAME":"Default Group"}]}, "name":"GET ASSOCIATED GROUPS" }}
