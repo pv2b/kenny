@@ -1,3 +1,5 @@
+using PmpApiClient;
+
 public static class Globals {
     public static ApiKeyring ApiKeyring;
 

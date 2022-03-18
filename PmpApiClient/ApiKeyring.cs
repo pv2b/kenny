@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using PmpApiClient;
 using System.Security.Claims;
+
+namespace PmpApiClient;
 
 public class ApiKeyring {
     private class Item {
@@ -72,7 +73,7 @@ public class ApiKeyring {
     public BasePmpApiClient CreateApiClient(string collection) {
         Item item = _keyring[collection];
         
-        return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
+        return new PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
     }
 
     public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
