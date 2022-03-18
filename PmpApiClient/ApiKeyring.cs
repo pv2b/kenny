@@ -81,4 +81,8 @@ public class ApiKeyring {
             throw new UnauthorizedAccessException();
         return CreateApiClient(collection);
     }
+
+    public IEnumerable<string> GetCollectionNames() {
+        return _keyring.Keys;
+    }
 }
