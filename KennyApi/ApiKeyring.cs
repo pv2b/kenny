@@ -35,7 +35,9 @@ public class ApiKeyring {
                 throw new Exception($"ApiAuthToken is not set for {item.Key}");
     }
 
-    private bool IsAuthorizedUser(ClaimsPrincipal user, Item item) {
+    private bool IsAuthorizedUser(ClaimsPrincipal user, string collection) {
+        Item item = _keyring[collection];
+        
         if (user.Identity == null || !user.Identity.IsAuthenticated)
             return false;
 
@@ -67,15 +69,15 @@ public class ApiKeyring {
         return !UserIsDenied() && UserIsAllowed();
     }
 
-    private BasePmpApiClient CreateApiClient(Item item) {
+    private BasePmpApiClient CreateApiClient(string collection) {
+        Item item = _keyring[collection];
+        
         return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
     }
 
     public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
-        Item item = _keyring[collection];
-        
-        if (!IsAuthorizedUser(user, item))
+        if (!IsAuthorizedUser(user, collection))
             throw new UnauthorizedAccessException();
-        return CreateApiClient(item);
+        return CreateApiClient(collection);
     }
 }
