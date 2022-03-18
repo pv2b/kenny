@@ -18,7 +18,7 @@ foreach (string collection in collectionNames) {
         resources.Add(resource);
     }
     using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
-        JsonSerializer.Serialize<List<Resource>>(fs, resources);
+        JsonSerializer.Serialize<List<Resource>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
     }
     File.Move(resourceFileTempPath, resourceFilePath, true);
 }
