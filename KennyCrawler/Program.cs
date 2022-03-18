@@ -20,6 +20,6 @@ foreach (string collection in collectionNames) {
     using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
         JsonSerializer.Serialize<List<Resource>>(fs, resources);
     }
-    File.Move(resourceFileTempPath, resourceFilePath);
+    File.Move(resourceFileTempPath, resourceFilePath, true);
 }
 Console.WriteLine("Done!");
