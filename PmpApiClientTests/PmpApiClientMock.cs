@@ -1,5 +1,8 @@
-namespace PmpApiClient;
+using PmpApiClient;
+using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Text.Json;
 
 public class PmpApiClientMock : BasePmpApiClient {
