@@ -31,9 +31,21 @@ public abstract class BasePmpApiClient {
         return GetResourceAccountListAsync(resource.Id);
     }
 
-    public async Task<IEnumerable<(Resource, Task<ResourceAccountList>)>> GetAllResourceAccountListAsync() {
+    public async IAsyncEnumerable<(Resource, ResourceAccountList)> GetAllResourceAccountListAsync() {
         var resources = await GetResourcesAsync();
-        return resources.Select(resource => (resource, GetResourceAccountListAsync(resource)));
+        var r = new List<(Resource, Task<ResourceAccountList>)>();
+        foreach (var resource in resources) {
+            r.Add((resource, GetResourceAccountListAsync(resource)));
+        }
+        foreach ((Resource resource, Task<ResourceAccountList> resourceAccountListTask) in r) {
+            ResourceAccountList resourceAccountList;
+            try {
+                resourceAccountList = await resourceAccountListTask;
+            } catch {
+                continue;
+            }
+            yield return (resource, resourceAccountList);
+        }
     }
 
     public abstract Task<ApiResponse<AccountPassword>?> GetAccountPasswordApiResponseAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request);
