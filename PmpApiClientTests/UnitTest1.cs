@@ -53,15 +53,15 @@ public class UnitTest1
     }
 
     [Fact]
-    public async void TestResource()
+    public async void TestResourceDetails()
     {
-        Resource resource = await PmpApiClient.GetResourceAsync("303");
+        ResourceDetails resourceDetails = await PmpApiClient.GetResourceDetailsAsync("303");
 
-        Assert.Equal("MS SQL server", resource.Type);
-        Assert.Equal("sqlserver-1", resource.DnsName);
-        Assert.Equal("http://sqlserver-1/", resource.Url);
+        Assert.Equal("MS SQL server", resourceDetails.Type);
+        Assert.Equal("sqlserver-1", resourceDetails.DnsName);
+        Assert.Equal("http://sqlserver-1/", resourceDetails.Url);
 
-        var account = resource?.Accounts?.First();
+        var account = resourceDetails?.Accounts?.First();
         Assert.Equal("308", account?.Id);
     }
 

@@ -26,7 +26,7 @@ public class DynamicFolderController : ControllerBase
         public string? TerminalConnectionType { get; set; }
     }
 
-    private RoyalJsonObject? makeRoyalJsonConnectionObject(Resource resource, Resource.Account account) {
+    private RoyalJsonObject? makeRoyalJsonConnectionObject(ResourceDetails resource, ResourceDetails.Account account) {
         var o = new RoyalJsonObject();
         switch(resource.Type) {
             case "Windows":
@@ -51,7 +51,7 @@ public class DynamicFolderController : ControllerBase
         return o;
     }
 
-    private Object makeRoyalJsonCredentialObject(Resource resource, Resource.Account account) {
+    private Object makeRoyalJsonCredentialObject(ResourceDetails resource, ResourceDetails.Account account) {
         return new {
             Type="DynamicCredential",
             Name=$"PMP credential for {resource.Name} ({account.Name})",
@@ -67,16 +67,16 @@ public class DynamicFolderController : ControllerBase
         if (!Globals.ApiKeyring.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
-        IEnumerable<Resource>? resources;
+        IEnumerable<ResourceDetails>? resources;
         using (FileStream fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
-            resources = await JsonSerializer.DeserializeAsync<List<Resource>>(fs);
+            resources = await JsonSerializer.DeserializeAsync<List<ResourceDetails>>(fs);
         }
         if (resources == null) {
             throw new Exception("Resources is null!");
         }
         var objects = new List<Object>();
         foreach (var resource in resources) {
-            foreach (var account in resource.Accounts ?? Enumerable.Empty<Resource.Account>()) {
+            foreach (var account in resource.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
                 /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
                 if (string.IsNullOrWhiteSpace(resource.DnsName))
                     continue;
