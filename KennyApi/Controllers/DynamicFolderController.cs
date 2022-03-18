@@ -35,7 +35,6 @@ public class DynamicFolderController : ControllerBase
             Id=$"PmpCred_{account.Id}",
             Username=account.Name,
             Path="Credentials",
-            TerminalConnectionType="SSH"
         };
     }
 
@@ -55,6 +54,9 @@ public class DynamicFolderController : ControllerBase
         var objects = new List<Object>();
         foreach (var resource in resources) {
             foreach (var account in resource.Accounts ?? Enumerable.Empty<Resource.Account>()) {
+                /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
+                if (string.IsNullOrWhiteSpace(resource.DnsName))
+                    continue;
                 objects.Add(makeRoyalJsonConnectionObject(resource, account));
                 objects.Add(makeRoyalJsonCredentialObject(resource, account));
             }
