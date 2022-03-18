@@ -39,7 +39,9 @@ public class DynamicFolderController : ControllerBase
     [HttpGet(Name = "GetDynamicFolder")]
     public async Task<Object> Get(string collection)
     {
-        var pmpApi = Globals.ApiKeyring.GetApiClient(HttpContext.User, collection);
+        if (!Globals.ApiKeyring.IsAuthorizedUser(HttpContext.User, collection))
+            throw new UnauthorizedAccessException();
+        var pmpApi = Globals.ApiKeyring.CreateApiClient(collection);
         IAsyncEnumerable<(Resource, ResourceAccountList)> resources = pmpApi.GetAllResourceAccountListAsync();
         var objects = new List<Object>();
         await foreach (var (resource, resourceDetails) in resources) {
