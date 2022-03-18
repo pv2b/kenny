@@ -15,6 +15,10 @@ public class PmpApiClientMock : BasePmpApiClient {
         return DeserializeFromFileAsync<ApiResponse<IEnumerable<ResourceSummary>>>(@"json\resources1.json");
     }
 
+    override public Task<ApiResponse<AssociatedGroupContainer>?> GetResourceAssociatedGroupsApiResponseAsync(string resourceId) {
+        return DeserializeFromFileAsync<ApiResponse<AssociatedGroupContainer>>(@"json\groups1.json");
+    }
+
     override public Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(String resourceId) {
         if (!resourceId.Equals("303")) {
             throw new NotImplementedException();
