@@ -35,12 +35,10 @@ public class ApiKeyring {
                 throw new Exception($"ApiAuthToken is not set for {item.Key}");
     }
 
-    public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
+    private void EnsureAuthorizedUser(ClaimsPrincipal user, Item item) {
         if (user.Identity == null || !user.Identity.IsAuthenticated)
             throw new UnauthorizedAccessException();
 
-        Item item = _keyring[collection];
-        
         if (user.Identity.Name == null)
             throw new UnauthorizedAccessException();
 
@@ -62,18 +60,22 @@ public class ApiKeyring {
         if (item.AllowUsers != null)
             foreach (string allowUser in item.AllowUsers)
                 if (String.Equals(username, allowUser, StringComparison.OrdinalIgnoreCase))
-                    goto authorized;
+                    return;
 
         /* Check if user is in allow group */
         if (item.AllowGroups != null)
             foreach (string allowGroup in item.AllowGroups)
                 if (user.IsInRole(allowGroup))
-                    goto authorized;
+                    return;
 
         /* User was not authorized in the allow list or group */
         throw new UnauthorizedAccessException();
+    }
 
-authorized:
+    public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
+        Item item = _keyring[collection];
+        
+        EnsureAuthorizedUser(user, item);
         /* loader ensures these aren't null */
         #pragma warning disable CS8604 
         return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
