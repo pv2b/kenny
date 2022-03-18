@@ -26,7 +26,7 @@ public class ApiKeyring {
     private Dictionary<string, Item> _keyring;
 
     public ApiKeyring(String filename) {
-        using (FileStream fs = File.Open(filename, FileMode.Open)) {
+        using (FileStream fs = File.Open(filename, FileMode.Open, FileAccess.Read)) {
             _keyring = JsonSerializer.Deserialize<Dictionary<string, Item>>(fs) ?? new Dictionary<string, Item>();
         }
         foreach (var item in _keyring)
