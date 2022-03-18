@@ -166,17 +166,7 @@ Add a dynamic folder with the following Dynamic Folder Script (Powershell):
 
 ... and the following Dynamic Credential Script (Powershell):
 
-    $ResourceId = @'
-    $Target.CustomField1$
-    '@
-
-    $CredentialId = @'
-    $DynamicCredential.EffectiveID$
-    '@
-
-    $AccountId = $CredentialId -replace "^PmpCred_", ""
-
-    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?collection=contoso&resourceId=$ResourceId&accountId=$AccountId").Content
+    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri 'https://kenny.contoso.com:5000/DynamicCredential?collection=contoso&dynamicCredentialId=$DynamicCredential.EffectiveId$').Content
 
 You will need to edit the script to edit the hostname of the Kenny server and
 the collection name.

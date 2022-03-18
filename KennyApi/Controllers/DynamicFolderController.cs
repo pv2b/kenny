@@ -16,23 +16,46 @@ public class DynamicFolderController : ControllerBase
         _logger = logger;
     }
 
-    private Object makeRoyalJsonConnectionObject(Resource resource, Resource.Account account) {
-        return new {
-            Type="TerminalConnection",
-            Name=$"{resource.Name} ({account.Name})",
-            ComputerName=resource.DnsName,
-            CustomField1=resource.Id,
-            Path="Connections",
-            CredentialID=$"PmpCred_{account.Id}",
-            Description=resource.Description
-        };
+    public class RoyalJsonObject {
+        public string? Type { get; set; }
+        public string? Name { get; set; }
+        public string? ComputerName { get; set; }
+        public string? Description { get; set; }
+        public string? Path { get; set; }
+        public string? CredentialId { get; set; }
+        public string? TerminalConnectionType { get; set; }
+    }
+
+    private RoyalJsonObject? makeRoyalJsonConnectionObject(Resource resource, Resource.Account account) {
+        var o = new RoyalJsonObject();
+        switch(resource.Type) {
+            case "Windows":
+                o.Type = "RemoteDesktopConnection";
+                break;
+
+            case "Linux":
+                o.Type = "TerminalConnection";
+                o.TerminalConnectionType = "SSH";
+                break;
+
+            default:
+                return null;
+        }
+
+        o.Name = $"{resource.Name} ({account.Name})";
+        o.ComputerName = resource.DnsName;
+        o.Path = "Connections";
+        o.CredentialId = new PmpCredentialId(resource.Id, account.Id).ToString();
+        o.Description = resource.Description;
+
+        return o;
     }
 
     private Object makeRoyalJsonCredentialObject(Resource resource, Resource.Account account) {
         return new {
             Type="DynamicCredential",
             Name=$"PMP credential for {resource.Name} ({account.Name})",
-            Id=$"PmpCred_{account.Id}",
+            Id=new PmpCredentialId(resource.Id, account.Id).ToString(),
             Username=account.Name,
             Path="Credentials",
         };
@@ -57,8 +80,11 @@ public class DynamicFolderController : ControllerBase
                 /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
                 if (string.IsNullOrWhiteSpace(resource.DnsName))
                     continue;
-                objects.Add(makeRoyalJsonConnectionObject(resource, account));
-                objects.Add(makeRoyalJsonCredentialObject(resource, account));
+                var connection = makeRoyalJsonConnectionObject(resource, account);
+                if (connection != null ) {
+                    objects.Add(connection);
+                    objects.Add(makeRoyalJsonCredentialObject(resource, account));
+                }
             }
         }
         return new {
