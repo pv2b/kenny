@@ -67,23 +67,23 @@ public class DynamicFolderController : ControllerBase
         if (!Globals.ApiKeyring.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
-        IEnumerable<ResourceDetails>? resources;
+        IEnumerable<Resource>? resources;
         using (FileStream fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
-            resources = await JsonSerializer.DeserializeAsync<List<ResourceDetails>>(fs);
+            resources = await JsonSerializer.DeserializeAsync<List<Resource>>(fs);
         }
         if (resources == null) {
             throw new Exception("Resources is null!");
         }
         var objects = new List<Object>();
         foreach (var resource in resources) {
-            foreach (var account in resource.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
+            foreach (var account in resource.Details.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
                 /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
-                if (string.IsNullOrWhiteSpace(resource.DnsName))
+                if (string.IsNullOrWhiteSpace(resource.Details.DnsName))
                     continue;
-                var connection = makeRoyalJsonConnectionObject(resource, account);
+                var connection = makeRoyalJsonConnectionObject(resource.Details, account);
                 if (connection != null ) {
                     objects.Add(connection);
-                    objects.Add(makeRoyalJsonCredentialObject(resource, account));
+                    objects.Add(makeRoyalJsonCredentialObject(resource.Details, account));
                 }
             }
         }
