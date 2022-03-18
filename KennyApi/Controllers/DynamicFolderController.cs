@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PmpApiClient;
+using System.Text.Json;
+using System.IO;
 
 namespace KennyApi.Controllers;
 
@@ -41,10 +43,16 @@ public class DynamicFolderController : ControllerBase
     {
         if (!Globals.ApiKeyring.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
-        var pmpApi = Globals.ApiKeyring.CreateApiClient(collection);
-        IAsyncEnumerable<Resource> resources = pmpApi.GetAllResourcesAsync();
+        string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
+        IEnumerable<Resource>? resources;
+        using (FileStream fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
+            resources = await JsonSerializer.DeserializeAsync<List<Resource>>(fs);
+        }
+        if (resources == null) {
+            throw new Exception("Resources is null!");
+        }
         var objects = new List<Object>();
-        await foreach (var resource in resources) {
+        foreach (var resource in resources) {
             foreach (var account in resource.Details.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
                 objects.Add(makeRoyalJsonConnectionObject(resource, account));
                 objects.Add(makeRoyalJsonCredentialObject(resource, account));
