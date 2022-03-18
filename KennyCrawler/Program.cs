@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text.Json;
 using PmpApiClient;
 
@@ -8,7 +8,7 @@ var apiKeyring = new ApiKeyring(apiKeyringPath);
 var collectionNames = apiKeyring.GetCollectionNames();
 
 foreach (string collection in collectionNames) {
-    Console.WriteLine("Crawling collection {collection}...");
+    Console.WriteLine($"Crawling collection {collection}...");
     var pmpApiClient = apiKeyring.CreateApiClient(collection);
     var resourceFilePath = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
     var resourceFileTempPath = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json.tmp");

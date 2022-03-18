@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KennyApi", "KennyApi\KennyApi.csproj", "{C0628910-59CB-4459-840E-3BA692A4C119}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KennyCrawler", "KennyCrawler\KennyCrawler.csproj", "{8B31AD61-A02F-4878-8EDC-40AE054FCBB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PmpApiClient", "PmpApiClient\PmpApiClient.csproj", "{E70E084A-2711-4F9B-9328-D668DAC48211}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PmpApiClientTests", "PmpApiClientTests\PmpApiClientTests.csproj", "{DB54E37E-8B5C-4974-9A38-4929590F722D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0628910-59CB-4459-840E-3BA692A4C119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0628910-59CB-4459-840E-3BA692A4C119}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0628910-59CB-4459-840E-3BA692A4C119}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0628910-59CB-4459-840E-3BA692A4C119}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B31AD61-A02F-4878-8EDC-40AE054FCBB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B31AD61-A02F-4878-8EDC-40AE054FCBB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B31AD61-A02F-4878-8EDC-40AE054FCBB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B31AD61-A02F-4878-8EDC-40AE054FCBB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E70E084A-2711-4F9B-9328-D668DAC48211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E70E084A-2711-4F9B-9328-D668DAC48211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E70E084A-2711-4F9B-9328-D668DAC48211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E70E084A-2711-4F9B-9328-D668DAC48211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB54E37E-8B5C-4974-9A38-4929590F722D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB54E37E-8B5C-4974-9A38-4929590F722D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB54E37E-8B5C-4974-9A38-4929590F722D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB54E37E-8B5C-4974-9A38-4929590F722D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
