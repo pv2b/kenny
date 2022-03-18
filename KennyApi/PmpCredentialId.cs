@@ -14,7 +14,7 @@ public class PmpCredentialId {
     public PmpCredentialId(string s) {
         Match m = s_parseRegex.Match(s);
         if (!m.Success)
-            throw new ArgumentException("cannot parse {s} into PmpCredentialId");
+            throw new ArgumentException($"cannot parse {s} into PmpCredentialId");
         ResourceId = m.Groups[1].Value;
         AccountId = m.Groups[2].Value;
     }
