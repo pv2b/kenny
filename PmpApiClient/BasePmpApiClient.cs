@@ -31,20 +31,14 @@ public abstract class BasePmpApiClient {
         return GetResourceDetailsAsync(resourceSummary.Id);
     }
 
-    public async IAsyncEnumerable<Resource> GetAllResourcesAsync() {
+    public async IAsyncEnumerable<ResourceDetails> GetAllResourceDetailsAsync() {
         var summaries = await GetAllResourceSummaryAsync();
-        var r = new List<(ResourceSummary, Task<ResourceDetails>)>();
+        var r = new List<Task<ResourceDetails>>();
         foreach (var summary in summaries) {
-            r.Add((summary, GetResourceDetailsAsync(summary)));
+            r.Add(GetResourceDetailsAsync(summary));
         }
-        foreach ((ResourceSummary summary, Task<ResourceDetails> detailsTask) in r) {
-            ResourceDetails details;
-            try {
-                details = await detailsTask;
-            } catch {
-                continue;
-            }
-            yield return new Resource(summary, details);
+        foreach (Task<ResourceDetails> detailsTask in r) {
+            yield return await detailsTask;
         }
     }
 
