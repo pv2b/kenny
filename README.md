@@ -6,12 +6,32 @@ documents using Dynamic Folder and Dynamic Credential technology.
 With Kenny, [logins](https://www.youtube.com/watch?v=yK0P1Bk8Cx4) to managed
 servers is a one-step process.
 
+## Architecture / project layout
+
+Kenny externally consists of two main components:
+
+- KennyCrawler periodically fetches information from the Password Manager Pro
+  API and stores it on disk. It is a console application that's intended to
+  be run from Windows Task Scheduler.
+- KennyApi provides authenticated and authorized access to the data fetched by
+  KennyCrawler. Additionally, it will fetch passwords from the PMP API on
+  demand. It's intended to run as a Windows Service.
+
+These two external components correspond to projects of the same name
+contained in this repository.
+
+In addition there are are two more projects:
+
+- PmpApiClient is a common library for interacting with the
+  Password Manager Pro API that is shared by both KennyCrawler and KennyApi.
+- PmpApiTests contains unit tests for the PmpApiClient library.
+
 ## Building / publishing
 
 The main application is KennyApi. To build it for installation, simply `cd`
-into the KennyApi directory and run `dotnet publish`.
-
-The files in KennyApi\bin\Debug\net6.0 need to be copied to server.
+into the root directory of the repository and run `dotnet build` followed by
+`dotnet publish`. You will need the .NET Core 6.0 SDK installed for that to
+work.
 
 ## Installing
 
