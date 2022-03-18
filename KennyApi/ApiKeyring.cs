@@ -77,8 +77,6 @@ public class ApiKeyring {
         
         if (!IsAuthorizedUser(user, item))
             throw new UnauthorizedAccessException();
-        /* loader ensures these aren't null */
-        #pragma warning disable CS8604 
         return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
     }
 }
