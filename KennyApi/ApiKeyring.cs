@@ -67,11 +67,15 @@ public class ApiKeyring {
         return !UserIsDenied() && UserIsAllowed();
     }
 
+    private BasePmpApiClient CreateApiClient(Item item) {
+        return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
+    }
+
     public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
         Item item = _keyring[collection];
         
         if (!IsAuthorizedUser(user, item))
             throw new UnauthorizedAccessException();
-        return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
+        return CreateApiClient(item);
     }
 }
