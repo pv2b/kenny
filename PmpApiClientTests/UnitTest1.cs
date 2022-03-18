@@ -13,10 +13,10 @@ public class UnitTest1
     [Fact]
     public async void TestApiResponseSuccess()
     {
-        ApiResponse<IEnumerable<Resource>>? response = await PmpApiClient.GetResourcesApiResponseAsync();
+        ApiResponse<IEnumerable<ResourceSummary>>? response = await PmpApiClient.GetAllResourceSummaryApiResponseAsync();
         Assert.NotNull(response);
 #pragma warning disable CS8602
-        ApiResponse<IEnumerable<Resource>>.ApiOperation operation = response.Operation;
+        ApiResponse<IEnumerable<ResourceSummary>>.ApiOperation operation = response.Operation;
 #pragma warning restore CS8602
         Assert.Equal("GET RESOURCES", operation.Name);
         Assert.Equal("Success", operation.Result.Status);
@@ -25,43 +25,43 @@ public class UnitTest1
     }
 
     [Fact]
-    public async void TestResources()
+    public async void TestResourceSummary()
     {
-        List<Resource> resources = (await PmpApiClient.GetResourcesAsync()).ToList();
-        Assert.NotNull(resources);
+        List<ResourceSummary> resourceSummaries = (await PmpApiClient.GetAllResourceSummaryAsync()).ToList();
+        Assert.NotNull(resourceSummaries);
 
-        Assert.Equal(3, resources.Count);
+        Assert.Equal(3, resourceSummaries.Count);
 
-        Assert.Equal("CentOS Machine", resources[0].Description);
-        Assert.Equal("CentOS Machine", resources[0].Name);
-        Assert.Equal("301", resources[0].Id);
-        Assert.Equal("Linux", resources[0].Type);
-        Assert.Equal(3, resources[0].NoOfAccounts);
+        Assert.Equal("CentOS Machine", resourceSummaries[0].Description);
+        Assert.Equal("CentOS Machine", resourceSummaries[0].Name);
+        Assert.Equal("301", resourceSummaries[0].Id);
+        Assert.Equal("Linux", resourceSummaries[0].Type);
+        Assert.Equal(3, resourceSummaries[0].NoOfAccounts);
 
-        Assert.Equal("Cisco IOS Device", resources[1].Description);
-        Assert.Equal("Cisco IOS Device", resources[1].Name);
-        Assert.Equal("302", resources[1].Id);
-        Assert.Equal("Cisco IOS", resources[1].Type);
-        Assert.Equal(2, resources[1].NoOfAccounts);
+        Assert.Equal("Cisco IOS Device", resourceSummaries[1].Description);
+        Assert.Equal("Cisco IOS Device", resourceSummaries[1].Name);
+        Assert.Equal("302", resourceSummaries[1].Id);
+        Assert.Equal("Cisco IOS", resourceSummaries[1].Type);
+        Assert.Equal(2, resourceSummaries[1].NoOfAccounts);
 
-        Assert.Equal("Weblogic Data Source Password", resources[2].Description);
-        Assert.Equal("WebLogic Server", resources[2].Name);
-        Assert.Equal("303", resources[2].Id);
-        Assert.Equal("WebLogic Server", resources[2].Type);
-        Assert.Equal(2, resources[2].NoOfAccounts);
+        Assert.Equal("Weblogic Data Source Password", resourceSummaries[2].Description);
+        Assert.Equal("WebLogic Server", resourceSummaries[2].Name);
+        Assert.Equal("303", resourceSummaries[2].Id);
+        Assert.Equal("WebLogic Server", resourceSummaries[2].Type);
+        Assert.Equal(2, resourceSummaries[2].NoOfAccounts);
 
     }
 
     [Fact]
-    public async void TestResourceAccountList()
+    public async void TestResourceDetails()
     {
-        ResourceAccountList resourceAccountList = await PmpApiClient.GetResourceAccountListAsync("303");
+        ResourceDetails resourceDetails = await PmpApiClient.GetResourceDetailsAsync("303");
 
-        Assert.Equal("MS SQL server", resourceAccountList.Type);
-        Assert.Equal("sqlserver-1", resourceAccountList.DnsName);
-        Assert.Equal("http://sqlserver-1/", resourceAccountList.Url);
+        Assert.Equal("MS SQL server", resourceDetails.Type);
+        Assert.Equal("sqlserver-1", resourceDetails.DnsName);
+        Assert.Equal("http://sqlserver-1/", resourceDetails.Url);
 
-        var account = resourceAccountList?.Accounts?.First();
+        var account = resourceDetails?.Accounts?.First();
         Assert.Equal("308", account?.Id);
     }
 

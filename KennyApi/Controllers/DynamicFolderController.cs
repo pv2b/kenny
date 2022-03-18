@@ -14,21 +14,21 @@ public class DynamicFolderController : ControllerBase
         _logger = logger;
     }
 
-    private Object makeRoyalJsonConnectionObject(Resource resource, ResourceAccountList resourceDetails, ResourceAccountList.Account account) {
+    private Object makeRoyalJsonConnectionObject(ResourceSummary resourceSummary, ResourceDetails resourceDetails, ResourceDetails.Account account) {
         return new {
             Type="TerminalConnection",
-            Name=$"{resource.Name} ({account.Name})",
+            Name=$"{resourceSummary.Name} ({account.Name})",
             ComputerName=resourceDetails.DnsName,
-            CustomField1=resource.Id,
+            CustomField1=resourceSummary.Id,
             Path="Connections",
             CredentialID=$"PmpCred_{account.Id}",
         };
     }
 
-    private Object makeRoyalJsonCredentialObject(Resource resource, ResourceAccountList resourceDetails, ResourceAccountList.Account account) {
+    private Object makeRoyalJsonCredentialObject(ResourceSummary resourceSummary, ResourceDetails resourceDetails, ResourceDetails.Account account) {
         return new {
             Type="DynamicCredential",
-            Name=$"PMP credential for {resource.Name} ({account.Name})",
+            Name=$"PMP credential for {resourceSummary.Name} ({account.Name})",
             Id=$"PmpCred_{account.Id}",
             Username=account.Name,
             Path="Credentials",
@@ -42,12 +42,12 @@ public class DynamicFolderController : ControllerBase
         if (!Globals.ApiKeyring.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         var pmpApi = Globals.ApiKeyring.CreateApiClient(collection);
-        IAsyncEnumerable<(Resource, ResourceAccountList)> resources = pmpApi.GetAllResourceAccountListAsync();
+        IAsyncEnumerable<(ResourceSummary, ResourceDetails)> resources = pmpApi.GetAllResourceDetailsAsync();
         var objects = new List<Object>();
-        await foreach (var (resource, resourceDetails) in resources) {
-            foreach (var account in resourceDetails.Accounts ?? Enumerable.Empty<ResourceAccountList.Account>()) {
-                objects.Add(makeRoyalJsonConnectionObject(resource, resourceDetails, account));
-                objects.Add(makeRoyalJsonCredentialObject(resource, resourceDetails, account));
+        await foreach (var (resourceSummary, resourceDetails) in resources) {
+            foreach (var account in resourceDetails.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
+                objects.Add(makeRoyalJsonConnectionObject(resourceSummary, resourceDetails, account));
+                objects.Add(makeRoyalJsonCredentialObject(resourceSummary, resourceDetails, account));
             }
         }
         return new {
