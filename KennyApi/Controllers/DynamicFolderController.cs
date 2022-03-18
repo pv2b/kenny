@@ -40,11 +40,10 @@ public class DynamicFolderController : ControllerBase
     public async Task<Object> Get(string collection)
     {
         var pmpApi = Globals.ApiKeyring.GetApiClient(HttpContext.User, collection);
-        IEnumerable<(Resource, Task<ResourceAccountList>)> resources = await pmpApi.GetAllResourceAccountListAsync();
+        IAsyncEnumerable<(Resource, ResourceAccountList)> resources = pmpApi.GetAllResourceAccountListAsync();
         var objects = new List<Object>();
-        foreach (var (resource, resourceAccountListTask) in resources) {
-            var resourceDetails = await resourceAccountListTask;
-            foreach (var account in resourceDetails.Accounts) {
+        await foreach (var (resource, resourceDetails) in resources) {
+            foreach (var account in resourceDetails.Accounts ?? Enumerable.Empty<ResourceAccountList.Account>()) {
                 objects.Add(makeRoyalJsonConnectionObject(resource, resourceDetails, account));
                 objects.Add(makeRoyalJsonCredentialObject(resource, resourceDetails, account));
             }

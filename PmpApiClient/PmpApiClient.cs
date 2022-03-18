@@ -7,9 +7,12 @@ public class PmpApiClient : BasePmpApiClient {
     Uri ApiBaseUri { get; }
     string AuthToken { get; }
     private static readonly HttpClient s_httpClient;
+    private const int MAX_CONNECTIONS = 8;
 
     static PmpApiClient() {
-        s_httpClient = new HttpClient();
+        var handler = new HttpClientHandler();
+        handler.MaxConnectionsPerServer = MAX_CONNECTIONS;
+        s_httpClient = new HttpClient(handler);
     }
 
     public PmpApiClient(Uri apiBaseUri, string authToken) {
