@@ -47,25 +47,24 @@ public class ApiKeyring {
         bool UserIsInList(IEnumerable<string>? userList) {
             if (userList == null)
                 return false;
-            foreach (string listedUser in userList)
-                if (String.Equals(username, listedUser, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            return false;
+            return userList.Any(listedUser => String.Equals(username, listedUser, StringComparison.OrdinalIgnoreCase));
         }
 
-        bool UserIsInAnyListedRole(IEnumerable<string>? roleList) {
+        bool UserIsInRoleList(IEnumerable<string>? roleList) {
             if (roleList == null)
                 return false;
-            foreach (string listedRole in roleList)
-                if (user.IsInRole(listedRole))
-                    return true;
-            return false;
+            return roleList.Any(listedRole => user.IsInRole(listedRole));
         }
 
-        if (UserIsInList(item.DenyUsers) || UserIsInAnyListedRole(item.DenyGroups))
-            return false;
+        bool UserIsDenied() {
+            return UserIsInList(item.DenyUsers) || UserIsInRoleList(item.DenyGroups);
+        }
 
-        return UserIsInList(item.AllowUsers) || UserIsInAnyListedRole(item.AllowGroups);
+        bool UserIsAllowed() {
+            return UserIsInList(item.AllowUsers) || UserIsInRoleList(item.AllowGroups);
+        }
+
+        return !UserIsDenied() && UserIsAllowed();
     }
 
     public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
