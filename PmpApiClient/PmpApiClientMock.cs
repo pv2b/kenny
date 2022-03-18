@@ -11,15 +11,15 @@ public class PmpApiClientMock : BasePmpApiClient {
         return response;
     }
 
-    override public Task<ApiResponse<IEnumerable<Resource>>?> GetResourcesApiResponseAsync() {
-        return DeserializeFromFileAsync<ApiResponse<IEnumerable<Resource>>>(@"json\resources1.json");
+    override public Task<ApiResponse<IEnumerable<ResourceSummary>>?> GetAllResourceSummaryApiResponseAsync() {
+        return DeserializeFromFileAsync<ApiResponse<IEnumerable<ResourceSummary>>>(@"json\resources1.json");
     }
 
-    override public Task<ApiResponse<ResourceAccountList>?> GetResourceAccountListApiResponseAsync(String resourceId) {
+    override public Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(String resourceId) {
         if (!resourceId.Equals("303")) {
             throw new NotImplementedException();
         }
-        return DeserializeFromFileAsync<ApiResponse<ResourceAccountList>>(@"json\accounts1.json");
+        return DeserializeFromFileAsync<ApiResponse<ResourceDetails>>(@"json\accounts1.json");
     }
 
     override public Task<ApiResponse<AccountPassword>?> GetAccountPasswordApiResponseAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {

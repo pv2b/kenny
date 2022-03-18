@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace PmpApiClient;
 
-public class ResourceAccountList {
+public class ResourceDetails {
 
     public class CustomField {
         public CustomField(string value, string type, string label, string columnName) {
@@ -50,7 +50,7 @@ public class ResourceAccountList {
         public string Id { get; }
     }
 
-    public ResourceAccountList(string id, string name, string description, string type, string dnsName, string passwordPolicy, string department, string location, string url, string owner, IEnumerable<CustomField> customFields, IEnumerable<Account> accounts)
+    public ResourceDetails(string id, string name, string description, string type, string dnsName, string passwordPolicy, string department, string location, string url, string owner, IEnumerable<CustomField> customFields, IEnumerable<Account> accounts)
     {
         Id = id;
         Name = name;

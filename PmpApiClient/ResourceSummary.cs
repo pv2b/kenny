@@ -2,8 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace PmpApiClient;
 
-public class Resource {
-    public Resource(string description, string name, string id, string type, int noOfAccounts) {
+public class ResourceSummary {
+    public ResourceSummary(string description, string name, string id, string type, int noOfAccounts) {
         Description = description;
         Name = name;
         Id = id;
