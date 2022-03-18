@@ -44,32 +44,28 @@ public class ApiKeyring {
 
         string username = user.Identity.Name;
 
-        /* Check if user is in deny list */
-        if (item.DenyUsers != null)
-            foreach (string denyUser in item.DenyUsers)
-                if (String.Equals(username, denyUser, StringComparison.OrdinalIgnoreCase))
-                    return false;
-
-        /* Check if user is in deny group */
-        if (item.DenyGroups != null)
-            foreach (string denyGroup in item.DenyGroups)
-                if (user.IsInRole(denyGroup))
-                    return false;
-
-        /* Check if user is in allow list */
-        if (item.AllowUsers != null)
-            foreach (string allowUser in item.AllowUsers)
-                if (String.Equals(username, allowUser, StringComparison.OrdinalIgnoreCase))
+        bool UserIsInList(IEnumerable<string>? userList) {
+            if (userList == null)
+                return false;
+            foreach (string listedUser in userList)
+                if (String.Equals(username, listedUser, StringComparison.OrdinalIgnoreCase))
                     return true;
+            return false;
+        }
 
-        /* Check if user is in allow group */
-        if (item.AllowGroups != null)
-            foreach (string allowGroup in item.AllowGroups)
-                if (user.IsInRole(allowGroup))
+        bool UserIsInAnyListedRole(IEnumerable<string>? roleList) {
+            if (roleList == null)
+                return false;
+            foreach (string listedRole in roleList)
+                if (user.IsInRole(listedRole))
                     return true;
+            return false;
+        }
 
-        /* User was not authorized in the allow list or group */
-        return false;
+        if (UserIsInList(item.DenyUsers) || UserIsInAnyListedRole(item.DenyGroups))
+            return false;
+
+        return UserIsInList(item.AllowUsers) || UserIsInAnyListedRole(item.AllowGroups);
     }
 
     public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
