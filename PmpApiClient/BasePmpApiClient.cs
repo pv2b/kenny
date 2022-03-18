@@ -44,7 +44,7 @@ public abstract class BasePmpApiClient {
             } catch {
                 continue;
             }
-            yield return new Resource(summary, details);
+            yield return new Resource(details);
         }
     }
 
