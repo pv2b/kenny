@@ -19,25 +19,25 @@ public abstract class BasePmpApiClient {
         return HandleApiResponse<IEnumerable<ResourceSummary>>(response);
     }
 
-    public abstract Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(string resourceId);
-    public async Task<ResourceDetails> GetResourceDetailsAsync(string resourceId) {
-        var response = await GetResourceDetailsApiResponseAsync(resourceId);
-        return HandleApiResponse<ResourceDetails>(response);
+    public abstract Task<ApiResponse<Resource>?> GetResourceApiResponseAsync(string resourceId);
+    public async Task<Resource> GetResourceAsync(string resourceId) {
+        var response = await GetResourceApiResponseAsync(resourceId);
+        return HandleApiResponse<Resource>(response);
     }
-    public Task<ResourceDetails> GetResourceDetailsAsync(ResourceSummary resourceSummary) {
+    public Task<Resource> GetResourceAsync(ResourceSummary resourceSummary) {
         if (resourceSummary.Id == null) {
             throw new Exception("Missing value for Id property");
         }
-        return GetResourceDetailsAsync(resourceSummary.Id);
+        return GetResourceAsync(resourceSummary.Id);
     }
 
-    public async IAsyncEnumerable<ResourceDetails> GetAllResourceDetailsAsync() {
+    public async IAsyncEnumerable<Resource> GetAllResourcesAsync() {
         var summaries = await GetAllResourceSummaryAsync();
-        var r = new List<Task<ResourceDetails>>();
+        var r = new List<Task<Resource>>();
         foreach (var summary in summaries) {
-            r.Add(GetResourceDetailsAsync(summary));
+            r.Add(GetResourceAsync(summary));
         }
-        foreach (Task<ResourceDetails> detailsTask in r) {
+        foreach (Task<Resource> detailsTask in r) {
             yield return await detailsTask;
         }
     }
@@ -49,7 +49,7 @@ public abstract class BasePmpApiClient {
         var response = await GetAccountPasswordApiResponseAsync(resourceId, accountId, request);
         return HandleApiResponse<AccountPassword>(response);
     }
-    public Task<AccountPassword> GetAccountPasswordAsync(ResourceSummary resource, ResourceDetails.Account account, string? reason = null, string? ticketId = null) {
+    public Task<AccountPassword> GetAccountPasswordAsync(ResourceSummary resource, Resource.Account account, string? reason = null, string? ticketId = null) {
         if (resource.Id == null) {
             throw new Exception("Missing value for resource Id property");
         }

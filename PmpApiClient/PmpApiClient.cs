@@ -43,8 +43,8 @@ public class PmpApiClient : BasePmpApiClient {
         return ApiGetAsync<ApiResponse<IEnumerable<ResourceSummary>>>($"restapi/json/v1/resources");
     }
 
-    override public Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(String resourceId) {
-        return ApiGetAsync<ApiResponse<ResourceDetails>>($"restapi/json/v1/resources/{resourceId}/accounts");
+    override public Task<ApiResponse<Resource>?> GetResourceApiResponseAsync(String resourceId) {
+        return ApiGetAsync<ApiResponse<Resource>>($"restapi/json/v1/resources/{resourceId}/accounts");
     }
 
     override public Task<ApiResponse<AccountPassword>?> GetAccountPasswordApiResponseAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {
