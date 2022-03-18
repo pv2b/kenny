@@ -26,8 +26,11 @@ Make sure that the SPN matches the FQDN of the API server.
 
 ### Copy files
 
-After building, grab the files out of KennyApi\bin\Debug\net6.0 and put
-them on the server. In this example, I will put them in C:\Kenny
+After building KennyApi, grab the files out of KennyApi\bin\Debug\net6.0
+and put them on the server. In this example, I will put them in C:\Kenny
+
+After building KennyCrawler, grab the files out of KennyCrawler\bin\Debug\net6.0
+and put them on the server. In this example, I will put them in C:\KennyCrawler
 
 ### Log on as service permissions
 
@@ -146,6 +149,14 @@ are empty or missing, nobody is allowed in. (I.e. there's no default
 
 Note that JSON requires backslashes to be escaped by doubling them inside
 strings.
+
+## KennyCrawler scheduled task
+
+Create scheduled task for KennyCrawler to run as Kenny service account.
+This can be done manually using task scheduler.
+
+IMPORTANT: Make the task have its working directory in C:\Kenny folder
+(where API is) NOT in C:\KennyCrawler folder!
 
 ## Royal TS Configuration
 
