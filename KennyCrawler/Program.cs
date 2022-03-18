@@ -13,12 +13,12 @@ foreach (string collection in collectionNames) {
     var resourceFilePath = $"Resources-{collection}.json";
     var resourceFileTempPath = $"Resources-{collection}.json.tmp";
 
-    var resources = new List<Resource>();
-    await foreach (var resource in pmpApiClient.GetAllResourcesAsync()) {
+    var resources = new List<ResourceDetails>();
+    await foreach (var resource in pmpApiClient.GetAllResourceDetailsAsync()) {
         resources.Add(resource);
     }
     using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
-        JsonSerializer.Serialize<List<Resource>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
+        JsonSerializer.Serialize<List<ResourceDetails>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
     }
     File.Move(resourceFileTempPath, resourceFilePath, true);
 }
