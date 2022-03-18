@@ -78,7 +78,7 @@ public class UnitTest1
     public async void TestResourceAssociatedGroups()
     {
         List<ResourceGroupSummary> groups = (await PmpApiClient.GetResourceAssociatedGroupsAsync("1234")).ToList();
-        Assert.Equal(1, groups.Count);
+        Assert.Single(groups);
         Assert.Equal(301, groups[0].Id);
         Assert.Equal("Default Group", groups[0].Name);
     }
