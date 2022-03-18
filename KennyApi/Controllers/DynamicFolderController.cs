@@ -24,6 +24,7 @@ public class DynamicFolderController : ControllerBase
             CustomField1=resource.Id,
             Path="Connections",
             CredentialID=$"PmpCred_{account.Id}",
+            Description=resource.Description
         };
     }
 
