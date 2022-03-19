@@ -6,14 +6,21 @@ using System.IO;
 namespace KennyApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-public class DynamicFolderController : ControllerBase
+[Route("")]
+public class RoyalTsApiController : ControllerBase
 {
-    private readonly ILogger<DynamicFolderController> _logger;
+    private readonly ILogger<RoyalTsApiController> _logger;
 
-    public DynamicFolderController(ILogger<DynamicFolderController> logger)
+    public RoyalTsApiController(ILogger<RoyalTsApiController> logger)
     {
         _logger = logger;
+    }
+    
+    private static ApiKeyring s_apiKeyring;
+
+    static RoyalTsApiController() {
+        var apiKeyringPath = Path.Join(AppContext.BaseDirectory, "ApiKeyring.json");
+        s_apiKeyring = new ApiKeyring(apiKeyringPath);
     }
 
     public class RoyalJsonObject {
@@ -61,10 +68,10 @@ public class DynamicFolderController : ControllerBase
         };
     }
 
-    [HttpGet(Name = "GetDynamicFolder")]
-    public async Task<Object> Get(string collection)
+    [HttpGet("DynamicFolder")]
+    public async Task<Object> GetDynamicFolder(string collection)
     {
-        if (!Globals.ApiKeyring.IsAuthorizedUser(HttpContext.User, collection))
+        if (!s_apiKeyring.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
         IEnumerable<Resource>? resources;
@@ -89,6 +96,20 @@ public class DynamicFolderController : ControllerBase
         }
         return new {
             Objects = objects
+        };
+    }
+
+    [HttpGet("DynamicCredential")]
+    public async Task<Object> GetDynamicCredential(string collection, string dynamicCredentialId)
+    {
+        if (!s_apiKeyring.IsAuthorizedUser(HttpContext.User, collection))
+            throw new UnauthorizedAccessException();
+        var pmpCredentialId = new PmpCredentialId(dynamicCredentialId);
+        var pmpApi = s_apiKeyring.CreateApiClient(collection);
+        string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
+        var accountPassword = await pmpApi.GetAccountPasswordAsync(pmpCredentialId.ResourceId, pmpCredentialId.AccountId, reason);
+        return new {
+            Password = accountPassword.Password
         };
     }
 }
