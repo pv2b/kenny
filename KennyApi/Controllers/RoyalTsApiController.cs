@@ -34,6 +34,9 @@ public class RoyalTsApiController : ControllerBase
     }
 
     private RoyalJsonObject? makeRoyalJsonConnectionObject(ResourceDetails resource, ResourceDetails.Account account) {
+        /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
+        if (string.IsNullOrWhiteSpace(resource.DnsName))
+            return null;
         var o = new RoyalJsonObject();
         switch(resource.Type) {
             case "Windows":
@@ -84,9 +87,6 @@ public class RoyalTsApiController : ControllerBase
         var objects = new List<Object>();
         foreach (var resource in resources) {
             foreach (var account in resource.Details.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
-                /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
-                if (string.IsNullOrWhiteSpace(resource.Details.DnsName))
-                    continue;
                 var connection = makeRoyalJsonConnectionObject(resource.Details, account);
                 if (connection != null ) {
                     objects.Add(connection);
