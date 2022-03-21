@@ -23,54 +23,6 @@ public class RoyalTsApiController : ControllerBase
         s_apiKeyring = new ApiKeyring(apiKeyringPath);
     }
 
-    public class RoyalJsonObject {
-        public string? Type { get; set; }
-        public string? Name { get; set; }
-        public string? ComputerName { get; set; }
-        public string? Description { get; set; }
-        public string? Path { get; set; }
-        public string? CredentialId { get; set; }
-        public string? TerminalConnectionType { get; set; }
-    }
-
-    private RoyalJsonObject? makeRoyalJsonConnectionObject(ResourceDetails resource, ResourceDetails.Account account) {
-        /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
-        if (string.IsNullOrWhiteSpace(resource.DnsName))
-            return null;
-        var o = new RoyalJsonObject();
-        switch(resource.Type) {
-            case "Windows":
-                o.Type = "RemoteDesktopConnection";
-                break;
-
-            case "Linux":
-                o.Type = "TerminalConnection";
-                o.TerminalConnectionType = "SSH";
-                break;
-
-            default:
-                return null;
-        }
-
-        o.Name = $"{resource.Name} ({account.Name})";
-        o.ComputerName = resource.DnsName;
-        o.Path = "Connections";
-        o.CredentialId = new PmpCredentialId(resource.Id, account.Id).ToString();
-        o.Description = resource.Description;
-
-        return o;
-    }
-
-    private Object makeRoyalJsonCredentialObject(ResourceDetails resource, ResourceDetails.Account account) {
-        return new {
-            Type="DynamicCredential",
-            Name=$"PMP credential for {resource.Name} ({account.Name})",
-            Id=new PmpCredentialId(resource.Id, account.Id).ToString(),
-            Username=account.Name,
-            Path="Credentials",
-        };
-    }
-
     [HttpGet("DynamicFolder")]
     public async Task<Object> GetDynamicFolder(string collection)
     {
@@ -87,10 +39,10 @@ public class RoyalTsApiController : ControllerBase
         var objects = new List<Object>();
         foreach (var resource in resources) {
             foreach (var account in resource.Details.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
-                var connection = makeRoyalJsonConnectionObject(resource.Details, account);
+                var connection = RoyalJsonObject.CreateConnection(resource.Details, account);
                 if (connection != null ) {
                     objects.Add(connection);
-                    objects.Add(makeRoyalJsonCredentialObject(resource.Details, account));
+                    objects.Add(RoyalJsonObject.CreateDynamicCredential(resource.Details, account));
                 }
             }
         }
