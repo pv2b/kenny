@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Security.Claims;
 
 namespace PmpApiClient;
 
@@ -36,53 +35,29 @@ public class ApiKeyring {
                 throw new Exception($"ApiAuthToken is not set for {item.Key}");
     }
 
-    public bool IsAuthorizedUser(ClaimsPrincipal user, string collection) {
-        Item item = _keyring[collection];
-        
-        if (user.Identity == null || !user.Identity.IsAuthenticated)
-            return false;
-
-        if (user.Identity.Name == null)
-            return false;
-
-        string username = user.Identity.Name;
-
-        bool UserIsInList(IEnumerable<string>? userList) {
-            if (userList == null)
-                return false;
-            return userList.Any(listedUser => String.Equals(username, listedUser, StringComparison.OrdinalIgnoreCase));
-        }
-
-        bool UserIsInRoleList(IEnumerable<string>? roleList) {
-            if (roleList == null)
-                return false;
-            return roleList.Any(listedRole => user.IsInRole(listedRole));
-        }
-
-        bool UserIsDenied() {
-            return UserIsInList(item.DenyUsers) || UserIsInRoleList(item.DenyGroups);
-        }
-
-        bool UserIsAllowed() {
-            return UserIsInList(item.AllowUsers) || UserIsInRoleList(item.AllowGroups);
-        }
-
-        return !UserIsDenied() && UserIsAllowed();
-    }
-
     public BasePmpApiClient CreateApiClient(string collection, CancellationToken cancellationToken = default) {
         Item item = _keyring[collection];
         
         return new PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken, cancellationToken);
     }
 
-    public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection, CancellationToken cancellationToken = default) {
-        if (!IsAuthorizedUser(user, collection))
-            throw new UnauthorizedAccessException();
-        return CreateApiClient(collection, cancellationToken);
-    }
-
     public IEnumerable<string> GetCollectionNames() {
         return _keyring.Keys;
+    }
+
+    public IEnumerable<string> GetAllowGroups(string collection) {
+        return _keyring[collection].AllowGroups ?? Enumerable.Empty<string>();
+    }
+
+    public IEnumerable<string>? GetDenyGroups(string collection) {
+        return _keyring[collection].DenyGroups ?? Enumerable.Empty<string>();
+    }
+
+    public IEnumerable<string>? GetAllowUsers(string collection) {
+        return _keyring[collection].AllowUsers ?? Enumerable.Empty<string>();
+    }
+
+    public IEnumerable<string>? GetDenyUsers(string collection) {
+        return _keyring[collection].DenyUsers ?? Enumerable.Empty<string>();
     }
 }

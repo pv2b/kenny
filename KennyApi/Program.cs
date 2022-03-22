@@ -24,6 +24,7 @@ builder.Services.AddControllers().AddJsonOptions(j => {
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<PmpApiService, PmpApiService>();
 
 builder.Host.UseWindowsService();
 

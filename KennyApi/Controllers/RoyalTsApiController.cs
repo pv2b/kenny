@@ -10,23 +10,18 @@ namespace KennyApi.Controllers;
 public class RoyalTsApiController : ControllerBase
 {
     private readonly ILogger<RoyalTsApiController> _logger;
+    private readonly PmpApiService _pmpApiService;
 
-    public RoyalTsApiController(ILogger<RoyalTsApiController> logger)
+    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, PmpApiService pmpApiService)
     {
         _logger = logger;
+        _pmpApiService = pmpApiService;
     }
     
-    private static ApiKeyring s_apiKeyring;
-
-    static RoyalTsApiController() {
-        var apiKeyringPath = Path.Join(AppContext.BaseDirectory, "ApiKeyring.json");
-        s_apiKeyring = new ApiKeyring(apiKeyringPath);
-    }
-
     [HttpGet("DynamicFolder")]
     public async Task<Object> GetDynamicFolder(string collection)
     {
-        if (!s_apiKeyring.IsAuthorizedUser(HttpContext.User, collection))
+        if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
         IEnumerable<Resource>? resources;
@@ -54,10 +49,10 @@ public class RoyalTsApiController : ControllerBase
     [HttpGet("DynamicCredential")]
     public async Task<Object> GetDynamicCredential(string collection, string dynamicCredentialId)
     {
-        if (!s_apiKeyring.IsAuthorizedUser(HttpContext.User, collection))
+        if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         var pmpCredentialId = new PmpCredentialId(dynamicCredentialId);
-        var pmpApi = s_apiKeyring.CreateApiClient(collection);
+        var pmpApi = _pmpApiService.CreateApiClient(collection);
         string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
         var accountPassword = await pmpApi.GetAccountPasswordAsync(pmpCredentialId.ResourceId, pmpCredentialId.AccountId, reason);
         return new {
