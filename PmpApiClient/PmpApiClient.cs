@@ -8,6 +8,7 @@ public class PmpApiClient : BasePmpApiClient {
     string AuthToken { get; }
     private static readonly HttpClient s_httpClient;
     private const int MAX_CONNECTIONS = 8;
+    private CancellationToken _cancellationToken;
 
     static PmpApiClient() {
         var handler = new HttpClientHandler();
@@ -15,9 +16,10 @@ public class PmpApiClient : BasePmpApiClient {
         s_httpClient = new HttpClient(handler);
     }
 
-    public PmpApiClient(Uri apiBaseUri, string authToken) {
+    public PmpApiClient(Uri apiBaseUri, string authToken, CancellationToken cancellationToken = default) {
         ApiBaseUri = apiBaseUri;
         AuthToken = authToken;
+        _cancellationToken = cancellationToken;
     }
 
     public static string FormatUri(FormattableString uri)
@@ -33,7 +35,7 @@ public class PmpApiClient : BasePmpApiClient {
         var uri = new Uri(ApiBaseUri, FormatUri(relativeUriFS));
         using (var request = new HttpRequestMessage(HttpMethod.Get, uri)) {
             request.Headers.Add("AUTHTOKEN", AuthToken);
-            var response = await s_httpClient.SendAsync(request);
+            var response = await s_httpClient.SendAsync(request, _cancellationToken);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<T>();
         }

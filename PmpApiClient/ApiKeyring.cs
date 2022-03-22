@@ -70,16 +70,16 @@ public class ApiKeyring {
         return !UserIsDenied() && UserIsAllowed();
     }
 
-    public BasePmpApiClient CreateApiClient(string collection) {
+    public BasePmpApiClient CreateApiClient(string collection, CancellationToken cancellationToken = default) {
         Item item = _keyring[collection];
         
-        return new PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken);
+        return new PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken, cancellationToken);
     }
 
-    public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection) {
+    public BasePmpApiClient GetApiClient(ClaimsPrincipal user, String collection, CancellationToken cancellationToken = default) {
         if (!IsAuthorizedUser(user, collection))
             throw new UnauthorizedAccessException();
-        return CreateApiClient(collection);
+        return CreateApiClient(collection, cancellationToken);
     }
 
     public IEnumerable<string> GetCollectionNames() {
