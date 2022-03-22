@@ -25,6 +25,7 @@ builder.Services.AddControllers().AddJsonOptions(j => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<PmpApiService, PmpApiService>();
+builder.Services.AddHostedService<PmpCrawlerService>();
 
 builder.Host.UseWindowsService();
 

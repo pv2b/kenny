@@ -8,22 +8,19 @@ servers is a one-step process.
 
 ## Architecture / project layout
 
-Kenny externally consists of two main components:
+Kenny externally consists of one main project, KennyApi, that:
 
-- KennyCrawler periodically fetches information from the Password Manager Pro
-  API and stores it on disk. It is a console application that's intended to
-  be run from Windows Task Scheduler.
-- KennyApi provides authenticated and authorized access to the data fetched by
-  KennyCrawler. Additionally, it will fetch passwords from the PMP API on
-  demand. It's intended to run as a Windows Service.
-
-These two external components correspond to projects of the same name
-contained in this repository.
+- periodically fetches information from the Password Manager Pro
+  API and stores it on disk.
+- provides authenticated and authorized access to the fetched data.
+  Additionally, it will fetch passwords from the PMP API on
+  demand.
+- is intended to run as a Windows Service.
 
 In addition there are are two more projects:
 
 - PmpApiClient is a common library for interacting with the
-  Password Manager Pro API that is shared by both KennyCrawler and KennyApi.
+  Password Manager Pro API.
 - PmpApiTests contains unit tests for the PmpApiClient library.
 
 ## Building / publishing
@@ -48,9 +45,6 @@ Make sure that the SPN matches the FQDN of the API server.
 
 After building KennyApi, grab the files out of KennyApi\bin\Debug\net6.0
 and put them on the server. In this example, I will put them in C:\Kenny
-
-After building KennyCrawler, grab the files out of KennyCrawler\bin\Debug\net6.0
-and put them on the server. In this example, I will put them in C:\KennyCrawler
 
 ### Log on as service permissions
 
@@ -169,14 +163,6 @@ are empty or missing, nobody is allowed in. (I.e. there's no default
 
 Note that JSON requires backslashes to be escaped by doubling them inside
 strings.
-
-## KennyCrawler scheduled task
-
-Create scheduled task for KennyCrawler to run as Kenny service account.
-This can be done manually using task scheduler.
-
-IMPORTANT: Make the task have its working directory in C:\Kenny folder
-(where API is) NOT in C:\KennyCrawler folder!
 
 ## Royal TS Configuration
 
