@@ -3,7 +3,7 @@ using PmpApiClient;
 using System.Text.Json;
 using System.IO;
 
-namespace KennyApi.Controllers;
+namespace Kenny.Controllers;
 
 [ApiController]
 [Route("")]

@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "KennyApi": {
+    "Kenny": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

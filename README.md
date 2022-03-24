@@ -8,7 +8,7 @@ servers is a one-step process.
 
 ## Architecture / project layout
 
-Kenny externally consists of one main project, KennyApi, that:
+Kenny externally consists of one main project, Kenny, that:
 
 - periodically fetches information from the Password Manager Pro
   API and stores it on disk.
@@ -25,7 +25,7 @@ In addition there are are two more projects:
 
 ## Building / publishing
 
-The main application is KennyApi. To build it for installation, simply `cd`
+The main application is Kenny. To build it for installation, simply `cd`
 into the root directory of the repository and run `dotnet build` followed by
 `dotnet publish`. You will need the .NET Core 6.0 SDK installed for that to
 work.
@@ -43,7 +43,7 @@ Make sure that the SPN matches the FQDN of the API server.
 
 ### Copy files
 
-After building KennyApi, grab the files out of KennyApi\bin\Debug\net6.0
+After building Kenny, grab the files out of Kenny\bin\Debug\net6.0
 and put them on the server. In this example, I will put them in C:\Kenny
 
 ### Log on as service permissions
@@ -63,7 +63,7 @@ To establish Log on as a service rights for a service user account:
 
 This has to be run as an admin:
 
-    New-EventLog -Source KennyApi -LogName Application
+    New-EventLog -Source Kenny -LogName Application
 
 ### SSL Certificate
 
@@ -103,14 +103,14 @@ The following Powershell snippet will set the appopriate file permissions and cr
     $app_path = "C:\Kenny"
     $service_user = "contoso\svc.kenny"
     
-    $exe_path = Join-Path $app_path "KennyApi.exe"
+    $exe_path = Join-Path $app_path "Kenny.exe"
     $acl = Get-Acl "$app_path"
     $aclRuleArgs = $service_user, "Read,Write,ReadAndExecute", "ContainerInherit,ObjectInherit", "None", "Allow"
     $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($aclRuleArgs)
     $acl.SetAccessRule($accessRule)
     $acl | Set-Acl "$app_path"
 
-    New-Service -Name "Kenny" -BinaryPathName (Join-Path $app_path "KennyApi.exe") -Credential $service_user -Description "Kenny integrates Royal TS with Password Manager Pro" -DisplayName "Kenny" -StartupType Automatic
+    New-Service -Name "Kenny" -BinaryPathName (Join-Path $app_path "Kenny.exe") -Credential $service_user -Description "Kenny integrates Royal TS with Password Manager Pro" -DisplayName "Kenny" -StartupType Automatic
 
 ### Add API keys and authorize them
 
