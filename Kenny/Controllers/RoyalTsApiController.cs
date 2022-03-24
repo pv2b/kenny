@@ -11,13 +11,13 @@ public class RoyalTsApiController : ControllerBase
 {
     private readonly ILogger<RoyalTsApiController> _logger;
     private readonly PmpApiService _pmpApiService;
-    private readonly PmpCrawlerService _pmpCrawlerService;
+    private readonly CrawlerCache _crawlerCache;
 
-    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, PmpApiService pmpApiService, PmpCrawlerService pmpCrawlerService)
+    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, PmpApiService pmpApiService, CrawlerCache crawlerCache)
     {
         _logger = logger;
         _pmpApiService = pmpApiService;
-        _pmpCrawlerService = pmpCrawlerService;
+        _crawlerCache = crawlerCache;
     }
     
     [HttpGet("DynamicFolder")]
@@ -26,7 +26,7 @@ public class RoyalTsApiController : ControllerBase
         if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection))
             throw new UnauthorizedAccessException();
         string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
-        IEnumerable<Resource>? resources = _pmpCrawlerService.GetResources(collection);
+        IEnumerable<Resource>? resources = _crawlerCache.Resources[collection];
         if (resources == null) {
             throw new Exception("Resources is null!");
         }

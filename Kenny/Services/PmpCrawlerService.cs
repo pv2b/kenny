@@ -8,21 +8,17 @@ public class PmpCrawlerService : IHostedService, IDisposable
     private readonly PmpApiService _pmpApiService;
     private Timer _timer = null!;
     private uint _crawlRunning = 0;
-    private Dictionary<string, List<Resource>> _resources;
+    private CrawlerCache _cache;
 
-    public PmpCrawlerService(ILogger<PmpCrawlerService> logger, PmpApiService pmpApiService)
+    public PmpCrawlerService(ILogger<PmpCrawlerService> logger, PmpApiService pmpApiService, CrawlerCache cache)
     {
         _logger = logger;
         _pmpApiService = pmpApiService;
-        _resources = new Dictionary<string, List<Resource>>();
+        _cache = cache;
     }
 
     private string GetCollectionFilename(string collection) {
         return Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
-    }
-
-    public IEnumerable<Resource> GetResources(string collection) {
-        return _resources[collection];
     }
 
     public async Task StartAsync(CancellationToken stoppingToken)
@@ -37,7 +33,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
                 using (FileStream fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
                     var resources = await JsonSerializer.DeserializeAsync<List<Resource>>(fs);
                     if (resources != null )
-                        _resources[collection] = resources;
+                        _cache.Resources[collection] = resources;
                 }
             } catch (FileNotFoundException) {
                 // If we can't open the cache file, no big deal, that just means the data will be crawled soon... */
@@ -71,7 +67,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
             await foreach (var resource in pmpApiClient.GetAllResourcesAsync()) {
                 resources.Add(resource);
             }
-            _resources[collection] = resources;
+            _cache.Resources[collection] = resources;
             using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
                 JsonSerializer.Serialize<List<Resource>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
             }
