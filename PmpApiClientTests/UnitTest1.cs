@@ -72,4 +72,14 @@ public class UnitTest1
         string password = accountPassword.Password;
 
         Assert.Equal("fqxdB7ded@4", password);
-    }}
+    }
+
+    [Fact]
+    public async void TestResourceAssociatedGroups()
+    {
+        List<ResourceGroupSummary> groups = (await PmpApiClient.GetResourceAssociatedGroupsAsync("1234")).ToList();
+        Assert.Single(groups);
+        Assert.Equal(301, groups[0].Id);
+        Assert.Equal("Default Group", groups[0].Name);
+    }
+}

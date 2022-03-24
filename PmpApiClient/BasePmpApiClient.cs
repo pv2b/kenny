@@ -19,6 +19,18 @@ public abstract class BasePmpApiClient {
         return HandleApiResponse<IEnumerable<ResourceSummary>>(response);
     }
 
+    public abstract Task<ApiResponse<AssociatedGroupContainer>?> GetResourceAssociatedGroupsApiResponseAsync(string resourceId);
+    public async Task<IEnumerable<ResourceGroupSummary>> GetResourceAssociatedGroupsAsync(string resourceId) {
+        var response = await GetResourceAssociatedGroupsApiResponseAsync(resourceId);
+        return HandleApiResponse<AssociatedGroupContainer>(response)?.Groups ?? Enumerable.Empty<ResourceGroupSummary>();
+    }
+    public Task<IEnumerable<ResourceGroupSummary>> GetResourceAssociatedGroupsAsync(ResourceSummary resourceSummary) {
+        if (resourceSummary.Id == null) {
+            throw new Exception("Missing value for Id property");
+        }
+        return GetResourceAssociatedGroupsAsync(resourceSummary.Id);
+    }
+
     public abstract Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(string resourceId);
     public async Task<ResourceDetails> GetResourceDetailsAsync(string resourceId) {
         var response = await GetResourceDetailsApiResponseAsync(resourceId);
@@ -33,18 +45,16 @@ public abstract class BasePmpApiClient {
 
     public async IAsyncEnumerable<Resource> GetAllResourcesAsync() {
         var summaries = await GetAllResourceSummaryAsync();
-        var r = new List<(ResourceSummary, Task<ResourceDetails>)>();
+        var r = new List<(ResourceSummary, Task<ResourceDetails>, Task<IEnumerable<ResourceGroupSummary>>)>();
         foreach (var summary in summaries) {
-            r.Add((summary, GetResourceDetailsAsync(summary)));
+            r.Add((summary, GetResourceDetailsAsync(summary), GetResourceAssociatedGroupsAsync(summary)));
         }
-        foreach ((ResourceSummary summary, Task<ResourceDetails> detailsTask) in r) {
+        foreach ((ResourceSummary summary, Task<ResourceDetails> detailsTask, Task<IEnumerable<ResourceGroupSummary>> groupsTask) in r) {
             ResourceDetails details;
-            try {
-                details = await detailsTask;
-            } catch {
-                continue;
-            }
-            yield return new Resource(details);
+            IEnumerable<ResourceGroupSummary> groups;
+            details = await detailsTask;
+            groups = await groupsTask;
+            yield return new Resource(details, groups);
         }
     }
 

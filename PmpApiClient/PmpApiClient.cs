@@ -45,6 +45,10 @@ public class PmpApiClient : BasePmpApiClient {
         return ApiGetAsync<ApiResponse<IEnumerable<ResourceSummary>>>($"restapi/json/v1/resources");
     }
 
+    override public Task<ApiResponse<AssociatedGroupContainer>?> GetResourceAssociatedGroupsApiResponseAsync(string resourceId) {
+        return ApiGetAsync<ApiResponse<AssociatedGroupContainer>>($"restapi/json/v1/resources/{resourceId}/associatedGroups");
+    }
+
     override public Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(String resourceId) {
         return ApiGetAsync<ApiResponse<ResourceDetails>>($"restapi/json/v1/resources/{resourceId}/accounts");
     }
