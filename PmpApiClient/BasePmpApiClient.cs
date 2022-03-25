@@ -1,6 +1,7 @@
 namespace PmpApiClient;
 
 using System;
+using System.Collections.Concurrent;
 
 public abstract class BasePmpApiClient {
     private T HandleApiResponse<T>(ApiResponse<T>? response, string operationDescription) {
@@ -45,22 +46,23 @@ public abstract class BasePmpApiClient {
 
     public async IAsyncEnumerable<Resource> GetAllResourcesAsync() {
         var summaries = await GetAllResourceSummaryAsync();
-        var r = new List<(ResourceSummary, Task<ResourceDetails>?, Task<IEnumerable<ResourceGroupSummary>>)>();
-        foreach (var summary in summaries) {
-            Task<ResourceDetails>? detailsTask = null;
-            if (summary.NoOfAccounts > 0)
-                detailsTask = GetResourceDetailsAsync(summary);
-            r.Add((summary, detailsTask, GetResourceAssociatedGroupsAsync(summary)));
-        }
-        foreach ((ResourceSummary summary, Task<ResourceDetails>? detailsTask, Task<IEnumerable<ResourceGroupSummary>> groupsTask) in r) {
-            ResourceDetails? details;
-            IEnumerable<ResourceGroupSummary> groups;
-            if (detailsTask != null)
-                details = await detailsTask;
-            else
-                details = null;
-            groups = await groupsTask;
-            yield return new Resource(summary, details, groups);
+        var resources = new ConcurrentBag<Resource>();
+
+        ParallelOptions parallelOptions = new() {
+            MaxDegreeOfParallelism = 8
+        };
+        await Parallel.ForEachAsync(summaries, parallelOptions, async (summary, token) =>
+        {
+            var details = (summary.NoOfAccounts > 0) ? await GetResourceDetailsAsync(summary) : null;
+            var groups = await GetResourceAssociatedGroupsAsync(summary);
+            lock (resources) {
+                resources.Add(new Resource(summary, details, groups));
+            }
+        });
+
+        /* this doesn't need to be async enumerable but I didn't want to change calling code... */
+        foreach (var resource in resources.OrderBy(r => r.Summary.Id)) {
+            yield return resource;
         }
     }
 
