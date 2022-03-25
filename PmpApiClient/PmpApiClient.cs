@@ -6,20 +6,14 @@ using System.Net.Http.Json;
 public class PmpApiClient : BasePmpApiClient {
     Uri ApiBaseUri { get; }
     string AuthToken { get; }
-    private static readonly HttpClient s_httpClient;
-    private const int MAX_CONNECTIONS = 8;
+    private HttpClient _httpClient;
     private CancellationToken _cancellationToken;
 
-    static PmpApiClient() {
-        var handler = new HttpClientHandler();
-        handler.MaxConnectionsPerServer = MAX_CONNECTIONS;
-        s_httpClient = new HttpClient(handler);
-    }
-
-    public PmpApiClient(Uri apiBaseUri, string authToken, CancellationToken cancellationToken = default) {
+    public PmpApiClient(Uri apiBaseUri, string authToken, HttpClient httpClient, CancellationToken cancellationToken = default) {
         ApiBaseUri = apiBaseUri;
         AuthToken = authToken;
         _cancellationToken = cancellationToken;
+        _httpClient = httpClient;
     }
 
     public static string FormatUri(FormattableString uri)
@@ -35,7 +29,7 @@ public class PmpApiClient : BasePmpApiClient {
         var uri = new Uri(ApiBaseUri, FormatUri(relativeUriFS));
         using (var request = new HttpRequestMessage(HttpMethod.Get, uri)) {
             request.Headers.Add("AUTHTOKEN", AuthToken);
-            var response = await s_httpClient.SendAsync(request, _cancellationToken);
+            var response = await _httpClient.SendAsync(request, _cancellationToken);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<T>();
         }

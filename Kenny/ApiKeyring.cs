@@ -18,10 +18,12 @@ public class ApiKeyring {
         }
     }
     private Dictionary<string, Item> _keyring;
+    private HttpClient _httpClient;
 
-    public ApiKeyring(IConfiguration configuration) {
+    public ApiKeyring(IHttpClientFactory httpClientFactory, IConfiguration configuration) {
         _keyring = new Dictionary<string, Item>();
         configuration.GetSection("PmpApi").Bind(_keyring);
+        _httpClient = httpClientFactory.CreateClient();
     }
 
     public BasePmpApiClient CreateApiClient(string collection, CancellationToken cancellationToken = default) {
@@ -31,7 +33,7 @@ public class ApiKeyring {
             throw new Exception($"ApiBaseUri is not set for {collection}");
         else if (item.ApiAuthToken == null)
             throw new Exception($"ApiAuthToken is not set for {collection}");
-        return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken, cancellationToken);
+        return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken, _httpClient, cancellationToken);
     }
 
     public IEnumerable<string> GetCollectionNames() {
