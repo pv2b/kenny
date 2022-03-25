@@ -1,9 +1,11 @@
 namespace PmpApiClient;
 
 public class Resource {
-    public ResourceDetails Details { get; }
+    public ResourceSummary Summary { get; }
+    public ResourceDetails? Details { get; }
     public IEnumerable<ResourceGroupSummary> Groups { get; }
-    public Resource(ResourceDetails details, IEnumerable<ResourceGroupSummary> groups) {
+    public Resource(ResourceSummary summary, ResourceDetails? details, IEnumerable<ResourceGroupSummary> groups) {
+        Summary = summary;
         Details = details;
         Groups = groups;
     }

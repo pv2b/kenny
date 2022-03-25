@@ -3,9 +3,8 @@ using System.Security.Claims;
 
 public class PmpApiService {
     public ApiKeyring ApiKeyring;
-    public PmpApiService() {
-        var apiKeyringPath = Path.Join(AppContext.BaseDirectory, "ApiKeyring.json");
-        ApiKeyring = new ApiKeyring(apiKeyringPath); 
+    public PmpApiService(IConfiguration configRoot, ApiKeyring apiKeyring) {
+        ApiKeyring = apiKeyring;
     }
 
     public bool IsAuthorizedUser(ClaimsPrincipal user, string collection) {

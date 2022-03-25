@@ -45,16 +45,22 @@ public abstract class BasePmpApiClient {
 
     public async IAsyncEnumerable<Resource> GetAllResourcesAsync() {
         var summaries = await GetAllResourceSummaryAsync();
-        var r = new List<(ResourceSummary, Task<ResourceDetails>, Task<IEnumerable<ResourceGroupSummary>>)>();
+        var r = new List<(ResourceSummary, Task<ResourceDetails>?, Task<IEnumerable<ResourceGroupSummary>>)>();
         foreach (var summary in summaries) {
-            r.Add((summary, GetResourceDetailsAsync(summary), GetResourceAssociatedGroupsAsync(summary)));
+            Task<ResourceDetails>? detailsTask = null;
+            if (summary.NoOfAccounts > 0)
+                detailsTask = GetResourceDetailsAsync(summary);
+            r.Add((summary, detailsTask, GetResourceAssociatedGroupsAsync(summary)));
         }
-        foreach ((ResourceSummary summary, Task<ResourceDetails> detailsTask, Task<IEnumerable<ResourceGroupSummary>> groupsTask) in r) {
-            ResourceDetails details;
+        foreach ((ResourceSummary summary, Task<ResourceDetails>? detailsTask, Task<IEnumerable<ResourceGroupSummary>> groupsTask) in r) {
+            ResourceDetails? details;
             IEnumerable<ResourceGroupSummary> groups;
-            details = await detailsTask;
+            if (detailsTask != null)
+                details = await detailsTask;
+            else
+                details = null;
             groups = await groupsTask;
-            yield return new Resource(details, groups);
+            yield return new Resource(summary, details, groups);
         }
     }
 

@@ -114,30 +114,34 @@ The following Powershell snippet will set the appopriate file permissions and cr
 
 ### Add API keys and authorize them
 
-Adding API keys happens by creating a file called `ApiKeyring.json` in the C:\Kenny`. folder
-(or wherever Kenny has been installed.)
+Adding API keys happens by editing the `PmpApi` property of the
+`appsettings.json` file in the C:\Kenny`. folder (or wherever Kenny has been installed.)
 
 The file should look like this:
 
     {
+      /* 8<----- */
+      "PmpApi": {
         "Contoso": {
-            "ApiBaseUri": "https://pmpserver.contoso.com/",
-            "ApiAuthToken": "SecureLuggage12345",
-            "AllowGroups": [ "CONTOSO\\Nice People", "CONTOSO\\Also Nice People" ],
-            "DenyGroups": [ "CONTOSO\\Naughty People", "CONTOSO\\Very Naughty People" ]
-            "AllowUsers": [ "CONTOSO\\goodguy1", "CONTOSO\\goodguy2" ]
-            "DenyUsers": [ "CONTOSO\\badguy1", "CONTOSO\\badguy2" ]
-        }
+          "ApiBaseUri": "https://pmpserver.contoso.com/",
+          "ApiAuthToken": "SecureLuggage12345",
+          "AllowGroups": [ "CONTOSO\\Nice People", "CONTOSO\\Also Nice People" ],
+          "DenyGroups": [ "CONTOSO\\Naughty People", "CONTOSO\\Very Naughty People" ],
+          "AllowUsers": [ "CONTOSO\\goodguy1", "CONTOSO\\goodguy2" ],
+          "DenyUsers": [ "CONTOSO\\badguy1", "CONTOSO\\badguy2" ]
+        },
         "Northwind": {
             "ApiBaseUri": "https://pmpserver.contoso.com/",
             "ApiAuthToken": "PasswordForAChocolateBar",
             "DenyUsers": [ "NORTHWIND\\hackerman" ]
         }
+      }
+      /* 8<----- */
     }
     
-The keys correspond to the `collection` parameter on the API calls. This
-is used to determine what API Key (`AuthToken`) from the keyring is to be
-used for that collection.
+The keys under `PmpApi` correspond to the `collection` parameter on the API
+calls. This is used to determine what API Key (`AuthToken`) from the keyring
+is to be used for that collection.
 
 `ApiBaseUri` (mandatory) determines the location of the Password Manager Pro
 server.
