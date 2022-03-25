@@ -25,29 +25,29 @@ public class PmpApiClient : BasePmpApiClient {
                 .ToArray());
     }
 
-    private async Task<T?> ApiGetAsync<T>(FormattableString relativeUriFS) {
+    private async Task<string> ApiGetAsync(FormattableString relativeUriFS) {
         var uri = new Uri(ApiBaseUri, FormatUri(relativeUriFS));
         using (var request = new HttpRequestMessage(HttpMethod.Get, uri)) {
             request.Headers.Add("AUTHTOKEN", AuthToken);
             var response = await _httpClient.SendAsync(request, _cancellationToken);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>();
+            return await response.Content.ReadAsStringAsync(_cancellationToken);
         }
     }
  
-    override public Task<ApiResponse<IEnumerable<ResourceSummary>>?> GetAllResourceSummaryApiResponseAsync() {
-        return ApiGetAsync<ApiResponse<IEnumerable<ResourceSummary>>>($"restapi/json/v1/resources");
+    override public Task<string> GetAllResourceSummaryJsonAsync() {
+        return ApiGetAsync($"restapi/json/v1/resources");
     }
 
-    override public Task<ApiResponse<AssociatedGroupContainer>?> GetResourceAssociatedGroupsApiResponseAsync(string resourceId) {
-        return ApiGetAsync<ApiResponse<AssociatedGroupContainer>>($"restapi/json/v1/resources/{resourceId}/associatedGroups");
+    override public Task<string> GetResourceAssociatedGroupsJsonAsync(string resourceId) {
+        return ApiGetAsync($"restapi/json/v1/resources/{resourceId}/associatedGroups");
     }
 
-    override public Task<ApiResponse<ResourceDetails>?> GetResourceDetailsApiResponseAsync(String resourceId) {
-        return ApiGetAsync<ApiResponse<ResourceDetails>>($"restapi/json/v1/resources/{resourceId}/accounts");
+    override public Task<string> GetResourceDetailsJsonAsync(String resourceId) {
+        return ApiGetAsync($"restapi/json/v1/resources/{resourceId}/accounts");
     }
 
-    override public Task<ApiResponse<AccountPassword>?> GetAccountPasswordApiResponseAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {
-        return ApiGetAsync<ApiResponse<AccountPassword>>($"restapi/json/v1/resources/{resourceId}/accounts/{accountId}/password");
+    override public Task<string> GetAccountPasswordJsonAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {
+        return ApiGetAsync($"restapi/json/v1/resources/{resourceId}/accounts/{accountId}/password");
     }
 }

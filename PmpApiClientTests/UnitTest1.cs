@@ -11,20 +11,6 @@ public class UnitTest1
 {
     BasePmpApiClient PmpApiClient = new PmpApiClientMock();
     [Fact]
-    public async void TestApiResponseSuccess()
-    {
-        ApiResponse<IEnumerable<ResourceSummary>>? response = await PmpApiClient.GetAllResourceSummaryApiResponseAsync();
-        Assert.NotNull(response);
-#pragma warning disable CS8602
-        ApiResponse<IEnumerable<ResourceSummary>>.ApiOperation operation = response.Operation;
-#pragma warning restore CS8602
-        Assert.Equal("GET RESOURCES", operation.Name);
-        Assert.Equal("Success", operation.Result.Status);
-        Assert.Equal("Resources fetched successfully", operation.Result.Message);
-        Assert.Equal(3, operation.TotalRows);
-    }
-
-    [Fact]
     public async void TestResourceSummary()
     {
         List<ResourceSummary> resourceSummaries = (await PmpApiClient.GetAllResourceSummaryAsync()).ToList();
