@@ -32,7 +32,9 @@ public class RoyalTsApiController : ControllerBase
         }
         var objects = new List<Object>();
         foreach (var resource in resources) {
-            foreach (var account in resource.Details.Accounts ?? Enumerable.Empty<ResourceDetails.Account>()) {
+            if (resource.Details?.Accounts == null)
+                continue;
+            foreach (var account in resource.Details.Accounts) {
                 var connection = RoyalJsonObject.CreateConnection(resource.Details, account);
                 if (connection != null) {
                     objects.Add(connection);
