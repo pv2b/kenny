@@ -49,19 +49,17 @@ public class RoyalJsonObject {
         return o;
     }
 
-    public static RoyalJsonObject CreateFolder(ResourceGroup rg) {
+    private static RoyalJsonObject CreateFolder(string? name = null, string? description = null) {
         var o = new RoyalJsonObject();
         o.Type = "Folder";
-        o.Name = rg.Name;
-        o.Description = rg.Description;
+        o.Name = name;
+        o.Description = description;
         o.Objects = new List<RoyalJsonObject>();
         return o;
     }
 
-    public static RoyalJsonObject CreateRootObject() {
-        var o = new RoyalJsonObject();
-        o.Objects = new List<RoyalJsonObject>();
-        return o;
+    public static RoyalJsonObject CreateFolder(ResourceGroup rg) {
+        return CreateFolder(rg.Name, rg.Description);
     }
 
     private void SortFolderTree() {
@@ -72,15 +70,17 @@ public class RoyalJsonObject {
         }
     }
 
-    public static RoyalJsonObject CreateFolderTree(IEnumerable<ResourceGroup> rgs, out Dictionary<long, RoyalJsonObject> foldersByResourceGroupId) {
-        var root = CreateRootObject();
-        foldersByResourceGroupId = new Dictionary<long, RoyalJsonObject>();
+    public static RoyalJsonObject CreateFolderTree(IEnumerable<ResourceGroup> rgs, out Dictionary<long, RoyalJsonObject> connectionFolders, out RoyalJsonObject credentialFolder) {
+        var root = CreateFolder();
+        credentialFolder = CreateFolder("_Credentials");
+        root.AddChild(credentialFolder);
+        connectionFolders = new Dictionary<long, RoyalJsonObject>();
         foreach (var rg in rgs) {
-            foldersByResourceGroupId[rg.Id] = CreateFolder(rg);
+            connectionFolders[rg.Id] = CreateFolder(rg);
         }
         foreach (var rg in rgs) {
-            var currentFolder = foldersByResourceGroupId[rg.Id];
-            var parentFolder = foldersByResourceGroupId.ContainsKey(rg.ParentId) ? foldersByResourceGroupId[rg.ParentId] : root;
+            var currentFolder = connectionFolders[rg.Id];
+            var parentFolder = connectionFolders.ContainsKey(rg.ParentId) ? connectionFolders[rg.ParentId] : root;
             parentFolder.AddChild(currentFolder);
         }
 

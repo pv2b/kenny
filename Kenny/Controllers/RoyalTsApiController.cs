@@ -30,24 +30,21 @@ public class RoyalTsApiController : ControllerBase
         if (resources == null) {
             throw new Exception("Resources is null!");
         }
-        Dictionary<long, RoyalJsonObject> foldersByResourceGroupId;
-        var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.ResourceGroups[collection], out foldersByResourceGroupId);
+        Dictionary<long, RoyalJsonObject> connectionFolders;
+        RoyalJsonObject credentialFolder;
+        var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.ResourceGroups[collection], out connectionFolders, out credentialFolder);
 
         foreach (var resource in resources) {
             if (resource.Details?.Accounts == null)
                 continue;
-            var objects = new List<RoyalJsonObject>();
             foreach (var account in resource.Details.Accounts) {
                 var connection = RoyalJsonObject.CreateConnection(resource.Details, account);
                 if (connection != null) {
-                    objects.Add(connection);
-                    objects.Add(RoyalJsonObject.CreateDynamicCredential(resource.Details, account));
-                }
-            }
-            foreach (var group in resource.Groups) {
-                var folder = foldersByResourceGroupId[group.Id];
-                foreach (var obj in objects) {
-                    folder.AddChild(obj);
+                    foreach (var group in resource.Groups) {
+                        var folder = connectionFolders[group.Id];
+                        folder.AddChild(connection);
+                    }
+                    credentialFolder.AddChild(RoyalJsonObject.CreateDynamicCredential(resource.Details, account));
                 }
             }
         }
