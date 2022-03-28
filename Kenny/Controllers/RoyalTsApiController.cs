@@ -23,9 +23,6 @@ public class RoyalTsApiController : ControllerBase
     [HttpGet("DynamicFolder")]
     public Object GetDynamicFolder(string collection)
     {
-        if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection))
-            throw new UnauthorizedAccessException();
-        string filename = Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
         IEnumerable<Resource>? resources = _crawlerCache.Resources[collection];
         if (resources == null) {
             throw new Exception("Resources is null!");
@@ -34,6 +31,8 @@ public class RoyalTsApiController : ControllerBase
         var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.ResourceGroups[collection], out connectionFolders);
 
         foreach (var resource in resources) {
+            if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection, resource))
+                continue;
             if (resource.Details?.Accounts == null)
                 continue;
             foreach (var account in resource.Details.Accounts) {
@@ -53,9 +52,10 @@ public class RoyalTsApiController : ControllerBase
     [HttpGet("DynamicCredential")]
     public async Task<Object> GetDynamicCredential(string collection, string dynamicCredentialId)
     {
-        if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection))
-            throw new UnauthorizedAccessException();
         var pmpCredentialId = new PmpCredentialId(dynamicCredentialId);
+        var resource = _crawlerCache.Resources[collection].FirstOrDefault<Resource>(r => r.Summary.Id == pmpCredentialId.ResourceId);
+        if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection, resource!))
+            throw new UnauthorizedAccessException();
         var pmpApi = _pmpApiService.CreateApiClient(collection);
         string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
         var accountPassword = await pmpApi.GetAccountPasswordAsync(pmpCredentialId.ResourceId, pmpCredentialId.AccountId, reason);

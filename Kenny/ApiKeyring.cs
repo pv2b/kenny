@@ -2,22 +2,14 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using PmpApiClient;
 using PmpSqlClient;
+using System.Security.Claims;
 
 public class ApiKeyring {
     private class Item {
         public string? ApiBaseUri { get; set; }
         public string? ApiAuthToken { get; set; }
-        public List<string> AllowGroups { get; set; }
-        public List<string> DenyGroups { get; set; }
-        public List<string> AllowUsers { get; set; }
-        public List<string> DenyUsers { get; set; }
-        public Item() {
-            AllowGroups = new List<string>();
-            DenyGroups = new List<string>();
-            AllowUsers = new List<string>();
-            DenyUsers = new List<string>();
-        }
         public string? ConnectionString { get; set; }
+        public IEnumerable<ResourceGroupAce>? Acl { get; set; }
     }
     private Dictionary<string, Item> _keyring;
     private HttpClient _httpClient;
@@ -50,19 +42,7 @@ public class ApiKeyring {
         return _keyring.Keys;
     }
 
-    public IEnumerable<string> GetAllowGroups(string collection) {
-        return _keyring[collection].AllowGroups;
-    }
-
-    public IEnumerable<string>? GetDenyGroups(string collection) {
-        return _keyring[collection].DenyGroups;
-    }
-
-    public IEnumerable<string>? GetAllowUsers(string collection) {
-        return _keyring[collection].AllowUsers;
-    }
-
-    public IEnumerable<string>? GetDenyUsers(string collection) {
-        return _keyring[collection].DenyUsers;
+    public IEnumerable<ResourceGroupAce> GetAcl(string collection) {
+        return _keyring[collection].Acl ?? new List<ResourceGroupAce>();
     }
 }

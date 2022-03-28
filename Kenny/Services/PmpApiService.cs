@@ -1,42 +1,13 @@
 using PmpApiClient;
+using PmpSqlClient;
 using System.Security.Claims;
 
 public class PmpApiService {
     public ApiKeyring ApiKeyring;
-    public PmpApiService(IConfiguration configRoot, ApiKeyring apiKeyring) {
+    private CrawlerCache _crawlerCache;
+    public PmpApiService(IConfiguration configRoot, ApiKeyring apiKeyring, CrawlerCache crawlerCache) {
         ApiKeyring = apiKeyring;
-    }
-
-    public bool IsAuthorizedUser(ClaimsPrincipal user, string collection) {
-        if (user.Identity == null || !user.Identity.IsAuthenticated)
-            return false;
-
-        if (user.Identity.Name == null)
-            return false;
-
-        string username = user.Identity.Name;
-
-        bool UserIsInList(IEnumerable<string>? userList) {
-            if (userList == null)
-                return false;
-            return userList.Any(listedUser => String.Equals(username, listedUser, StringComparison.OrdinalIgnoreCase));
-        }
-
-        bool UserIsInRoleList(IEnumerable<string>? roleList) {
-            if (roleList == null)
-                return false;
-            return roleList.Any(listedRole => user.IsInRole(listedRole));
-        }
-
-        bool UserIsDenied() {
-            return UserIsInList(ApiKeyring.GetDenyUsers(collection)) || UserIsInRoleList(ApiKeyring.GetDenyGroups(collection));
-        }
-
-        bool UserIsAllowed() {
-            return UserIsInList(ApiKeyring.GetAllowUsers(collection)) || UserIsInRoleList(ApiKeyring.GetAllowGroups(collection));
-        }
-
-        return !UserIsDenied() && UserIsAllowed();
+        _crawlerCache = crawlerCache;
     }
 
     public BasePmpApiClient CreateApiClient(string collection) {
@@ -46,4 +17,26 @@ public class PmpApiService {
     public PmpSqlClient.PmpSqlClient CreateSqlClient(string collection) {
         return ApiKeyring.CreateSqlClient(collection);
     }
+
+    public bool IsAuthorizedUser(ClaimsPrincipal user, string collection, Resource resource) {
+        var acl = ApiKeyring.GetAcl(collection);
+        if (acl == null) return false;
+
+        var rgsummary = resource.Groups.FirstOrDefault(g => !g.Name?.Equals("Default Group") ?? true);
+        if (rgsummary == null)
+            return false;
+
+        var rgs = new Dictionary<long, ResourceGroup>();
+        foreach (var rg_ in _crawlerCache.ResourceGroups[collection]) {
+            rgs[rg_.Id!] = rg_;
+        }
+        var rg = rgs[rgsummary.Id];
+
+        foreach (var ace in acl) {
+             var action = ace.Check(user, rg, rgs);
+             if (action == ResourceGroupAce.AceAction.ALLOW) return true;
+             if (action == ResourceGroupAce.AceAction.DENY) return false;
+         }
+         return false;
+     }
 }
