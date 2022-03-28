@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PmpApiClient\PmpApiClient.csproj" />
+    <ProjectReference Include="..\PmpSqlClient\PmpSqlClient.csproj" />
   </ItemGroup>
 
 </Project>

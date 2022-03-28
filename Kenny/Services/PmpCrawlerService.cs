@@ -1,4 +1,5 @@
 using PmpApiClient;
+using PmpSqlClient;
 using System.Threading;
 using System.Text.Json;
 
@@ -17,8 +18,8 @@ public class PmpCrawlerService : IHostedService, IDisposable
         _cache = cache;
     }
 
-    private string GetCollectionFilename(string collection) {
-        return Path.Join(AppContext.BaseDirectory, $"Resources-{collection}.json");
+    private string GetCollectionFilename(string prefix, string collection) {
+        return Path.Join(AppContext.BaseDirectory, $"{prefix}-{collection}.json");
     }
 
     public async Task StartAsync(CancellationToken stoppingToken)
@@ -28,12 +29,23 @@ public class PmpCrawlerService : IHostedService, IDisposable
         var collectionNames = _pmpApiService.ApiKeyring.GetCollectionNames();
 
         foreach (string collection in collectionNames) {
-            string filename = GetCollectionFilename(collection);
+            string resourcesFile = GetCollectionFilename("Resources", collection);
             try {
-                using (FileStream fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
+                using (FileStream fs = System.IO.File.Open(resourcesFile, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
                     var resources = await JsonSerializer.DeserializeAsync<List<Resource>>(fs);
                     if (resources != null )
                         _cache.Resources[collection] = resources;
+                }
+            } catch (FileNotFoundException) {
+                // If we can't open the cache file, no big deal, that just means the data will be crawled soon... */
+            }
+
+            string resourceGroupsFile = GetCollectionFilename("ResourceGroups", collection);
+            try {
+                using (FileStream fs = System.IO.File.Open(resourceGroupsFile, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
+                    var rgs = await JsonSerializer.DeserializeAsync<List<ResourceGroup>>(fs);
+                    if (rgs != null )
+                        _cache.ResourceGroups[collection] = rgs;
                 }
             } catch (FileNotFoundException) {
                 // If we can't open the cache file, no big deal, that just means the data will be crawled soon... */
@@ -44,23 +56,13 @@ public class PmpCrawlerService : IHostedService, IDisposable
             TimeSpan.FromSeconds(300));
     }
 
-    private async void DoWork(object? stoppingToken_)
-    {
-        CancellationToken stoppingToken = (CancellationToken?)stoppingToken_ ?? default(CancellationToken);
-        uint crawlAlreadyRunning = Interlocked.Exchange(ref _crawlRunning, 1);
-        if (crawlAlreadyRunning == 1) {
-            _logger.LogInformation("Time to run Pmp Crawler, but crawler is already running... skipping!");
-            // crawl was already running, so don't start it again...
-            return;
-        }
-
-        _logger.LogInformation("Pmp Crawler started");
+    private async Task CrawlApi() {
         var collectionNames = _pmpApiService.ApiKeyring.GetCollectionNames();
 
         foreach (string collection in collectionNames) {
-            Console.WriteLine($"Crawling collection {collection}...");
+            Console.WriteLine($"Crawling collection {collection} API...");
             var pmpApiClient = _pmpApiService.CreateApiClient(collection);
-            var resourceFilePath = GetCollectionFilename(collection);
+            var resourceFilePath = GetCollectionFilename("Resources", collection);
             var resourceFileTempPath = $"{resourceFilePath}.tmp";
 
             List<Resource> resources = new List<Resource>();
@@ -73,7 +75,49 @@ public class PmpCrawlerService : IHostedService, IDisposable
             }
             File.Move(resourceFileTempPath, resourceFilePath, true);
         }
-        _logger.LogInformation("Pmp Crawler finished");
+    }
+
+    private async Task CrawlSql() {
+        var collectionNames = _pmpApiService.ApiKeyring.GetCollectionNames();
+
+        foreach (string collection in collectionNames) {
+            Console.WriteLine($"Crawling collection {collection} SQL...");
+            var pmpSqlClient = _pmpApiService.CreateSqlClient(collection);
+            var rgFilePath = GetCollectionFilename("ResourceGroups", collection);
+            var rgFileTempPath = $"{rgFilePath}.tmp";
+
+            var rgs = new List<ResourceGroup>();
+            await foreach (var rg in pmpSqlClient.GetResourceGroupsAsync()) {
+                rgs.Add(rg);
+            }
+            _cache.ResourceGroups[collection] = rgs;
+            using (FileStream fs = File.Open(rgFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                JsonSerializer.Serialize<List<ResourceGroup>>(fs, rgs, new JsonSerializerOptions { WriteIndented = true });
+            }
+            File.Move(rgFileTempPath, rgFilePath, true);
+        }
+    }
+
+    private async void DoWork(object? stoppingToken_)
+    {
+        CancellationToken stoppingToken = (CancellationToken?)stoppingToken_ ?? default(CancellationToken);
+        uint crawlAlreadyRunning = Interlocked.Exchange(ref _crawlRunning, 1);
+        if (crawlAlreadyRunning == 1) {
+            _logger.LogInformation("Time to run Pmp Crawler, but crawler is already running... skipping!");
+            // crawl was already running, so don't start it again...
+            return;
+        }
+
+        try {
+            _logger.LogInformation("Pmp Crawler started");
+            var apiTask = CrawlApi();
+            var sqlTask = CrawlSql();
+            await apiTask;
+            await sqlTask;
+        } finally {
+            crawlAlreadyRunning = 0;
+            _logger.LogInformation("Pmp Crawler finished");
+        }
     }
 
     public Task StopAsync(CancellationToken stoppingToken)

@@ -11,7 +11,7 @@ servers is a one-step process.
 Kenny externally consists of one main project, Kenny, that:
 
 - periodically fetches information from the Password Manager Pro
-  API and stores it on disk.
+  API and SQL Database and stores it on disk.
 - provides authenticated and authorized access to the fetched data.
   Additionally, it will fetch passwords from the PMP API on
   demand.
@@ -22,6 +22,8 @@ In addition there are are two more projects:
 - PmpApiClient is a common library for interacting with the
   Password Manager Pro API.
 - PmpApiTests contains unit tests for the PmpApiClient library.
+- PmpSqlClient is a common library for interacting with the
+  Password Manager Pro SQL Database
 
 ## Building / publishing
 
@@ -131,9 +133,9 @@ The file should look like this:
           "DenyUsers": [ "CONTOSO\\badguy1", "CONTOSO\\badguy2" ]
         },
         "Northwind": {
-            "ApiBaseUri": "https://pmpserver.contoso.com/",
-            "ApiAuthToken": "PasswordForAChocolateBar",
-            "DenyUsers": [ "NORTHWIND\\hackerman" ]
+          "ApiBaseUri": "https://pmpserver.contoso.com/",
+          "ApiAuthToken": "PasswordForAChocolateBar",
+          "DenyUsers": [ "NORTHWIND\\hackerman" ]
         }
       }
       /* 8<----- */
@@ -167,6 +169,18 @@ are empty or missing, nobody is allowed in. (I.e. there's no default
 
 Note that JSON requires backslashes to be escaped by doubling them inside
 strings.
+
+## SQL Configuration
+
+Configure the SQL server connection string in `appsettings.json` as per the example below:
+
+    {
+      /* 8<----- */
+      "PmpSql": {
+        "ConnectionString": "Data Source=DSPMP-DB04\\PMP;Persist Security Info=False;Initial Catalog=PassTrix;Integrated Security=true"
+      }
+      /* 8<----- */
+    }
 
 ## Royal TS Configuration
 

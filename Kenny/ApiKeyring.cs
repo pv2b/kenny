@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using PmpApiClient;
+using PmpSqlClient;
 
 public class ApiKeyring {
     private class Item {
@@ -16,6 +17,7 @@ public class ApiKeyring {
             AllowUsers = new List<string>();
             DenyUsers = new List<string>();
         }
+        public string? ConnectionString { get; set; }
     }
     private Dictionary<string, Item> _keyring;
     private HttpClient _httpClient;
@@ -34,6 +36,14 @@ public class ApiKeyring {
         else if (item.ApiAuthToken == null)
             throw new Exception($"ApiAuthToken is not set for {collection}");
         return new PmpApiClient.PmpApiClient(new Uri(item.ApiBaseUri), item.ApiAuthToken, _httpClient, cancellationToken);
+    }
+
+    public PmpSqlClient.PmpSqlClient CreateSqlClient(string collection) {
+        Item item = _keyring[collection];
+        
+        if (item.ConnectionString == null)
+            throw new Exception($"ConnectionString is not set for {collection}");
+        return new PmpSqlClient.PmpSqlClient(item.ConnectionString);
     }
 
     public IEnumerable<string> GetCollectionNames() {

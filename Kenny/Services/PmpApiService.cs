@@ -42,4 +42,8 @@ public class PmpApiService {
     public BasePmpApiClient CreateApiClient(string collection) {
         return ApiKeyring.CreateApiClient(collection);
     }
+
+    public PmpSqlClient.PmpSqlClient CreateSqlClient(string collection) {
+        return ApiKeyring.CreateSqlClient(collection);
+    }
 }
