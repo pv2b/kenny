@@ -186,11 +186,13 @@ Configure the SQL server connection string in `appsettings.json` as per the exam
 
 Add a dynamic folder with the following Dynamic Folder Script (Powershell):
 
+    $ProgressPreference = 'SilentlyContinue'
     [System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
     (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri https://kenny.contoso.com:5000/DynamicFolder?collection=contoso).Content
 
 ... and the following Dynamic Credential Script (Powershell):
 
+    $ProgressPreference = 'SilentlyContinue'
     [System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
     $credid = '$DynamicCredential.EffectiveID$'
     (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?collection=contoso&dynamicCredentialId=$credid").Content
