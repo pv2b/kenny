@@ -34,7 +34,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
                 using (FileStream fs = System.IO.File.Open(resourcesFile, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
                     var resources = await JsonSerializer.DeserializeAsync<List<Resource>>(fs);
                     if (resources != null )
-                        _cache.Resources[collection] = resources;
+                        _cache.UpdateResources(collection, resources);
                 }
             } catch (FileNotFoundException) {
                 // If we can't open the cache file, no big deal, that just means the data will be crawled soon... */
@@ -45,7 +45,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
                 using (FileStream fs = System.IO.File.Open(resourceGroupsFile, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
                     var rgs = await JsonSerializer.DeserializeAsync<List<ResourceGroup>>(fs);
                     if (rgs != null )
-                        _cache.ResourceGroups[collection] = rgs;
+                        _cache.UpdateResourceGroups(collection, rgs);
                 }
             } catch (FileNotFoundException) {
                 // If we can't open the cache file, no big deal, that just means the data will be crawled soon... */
@@ -69,7 +69,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
             await foreach (var resource in pmpApiClient.GetAllResourcesAsync()) {
                 resources.Add(resource);
             }
-            _cache.Resources[collection] = resources;
+            _cache.UpdateResources(collection, resources);
             using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
                 JsonSerializer.Serialize<List<Resource>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
             }
@@ -90,7 +90,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
             await foreach (var rg in pmpSqlClient.GetResourceGroupsAsync()) {
                 rgs.Add(rg);
             }
-            _cache.ResourceGroups[collection] = rgs;
+            _cache.UpdateResourceGroups(collection, rgs);
             using (FileStream fs = File.Open(rgFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
                 JsonSerializer.Serialize<List<ResourceGroup>>(fs, rgs, new JsonSerializerOptions { WriteIndented = true });
             }

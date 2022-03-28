@@ -26,10 +26,7 @@ public class PmpApiService {
         if (rgsummary == null)
             return false;
 
-        var rgs = new Dictionary<long, ResourceGroup>();
-        foreach (var rg_ in _crawlerCache.ResourceGroups[collection]) {
-            rgs[rg_.Id!] = rg_;
-        }
+        var rgs = _crawlerCache.GetResourceGroupDict(collection);
         var rg = rgs[rgsummary.Id];
 
         foreach (var ace in acl) {

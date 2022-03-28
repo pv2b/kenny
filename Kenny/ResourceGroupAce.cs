@@ -23,7 +23,7 @@ public class ResourceGroupAce {
         return false;
     }
 
-    public AceAction? Check(ClaimsPrincipal user, ResourceGroup rg, Dictionary<long, ResourceGroup> rgs) {
+    public AceAction? Check(ClaimsPrincipal user, ResourceGroup rg, IDictionary<long, ResourceGroup> rgs) {
         while (!IsGroupMatch(rg.Name)) {
             if (!Recursive)
                 return null;
