@@ -15,7 +15,7 @@ public class RoyalJsonObject {
 
     public static RoyalJsonObject? CreateConnection(ResourceDetails resource, ResourceDetails.Account account) {
         /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
-        if (string.IsNullOrWhiteSpace(resource.DnsName))
+        if (string.IsNullOrWhiteSpace(resource.DnsName) || resource.DnsName.Equals("N/A"))
             return null;
         var o = new RoyalJsonObject();
         switch(resource.Type) {
