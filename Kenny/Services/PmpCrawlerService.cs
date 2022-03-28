@@ -115,7 +115,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
             await apiTask;
             await sqlTask;
         } finally {
-            crawlAlreadyRunning = 0;
+            _crawlRunning = 0;
             _logger.LogInformation("Pmp Crawler finished");
         }
     }
