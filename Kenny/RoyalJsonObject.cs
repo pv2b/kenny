@@ -71,10 +71,8 @@ public class RoyalJsonObject {
         }
     }
 
-    public static RoyalJsonObject CreateFolderTree(IEnumerable<ResourceGroup> rgs, out Dictionary<long, RoyalJsonObject> connectionFolders, out RoyalJsonObject credentialFolder) {
+    public static RoyalJsonObject CreateFolderTree(IEnumerable<ResourceGroup> rgs, out Dictionary<long, RoyalJsonObject> connectionFolders) {
         var root = CreateFolder();
-        credentialFolder = CreateFolder("_Credentials");
-        root.AddChild(credentialFolder);
         connectionFolders = new Dictionary<long, RoyalJsonObject>();
         foreach (var rg in rgs) {
             connectionFolders[rg.Id] = CreateFolder(rg);
@@ -94,5 +92,21 @@ public class RoyalJsonObject {
             Objects = new List<RoyalJsonObject>();
         }
         Objects.Add(obj);
+    }
+
+    public void PurgeEmptyFoldersRecursive() {
+        if (Objects == null) return;
+        var keptObjects = new List<RoyalJsonObject>();
+        foreach (var child in Objects) {
+            bool keep = true;
+            if (child.Type != null && child.Type.Equals("Folder")) {
+                child.PurgeEmptyFoldersRecursive();
+                keep = child.Objects != null && child.Objects.Count > 0;
+            }
+            if (keep) {
+                keptObjects.Add(child);
+            }
+        }
+        Objects = keptObjects;
     }
 }

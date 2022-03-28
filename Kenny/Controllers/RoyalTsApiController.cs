@@ -31,23 +31,21 @@ public class RoyalTsApiController : ControllerBase
             throw new Exception("Resources is null!");
         }
         Dictionary<long, RoyalJsonObject> connectionFolders;
-        RoyalJsonObject credentialFolder;
-        var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.ResourceGroups[collection], out connectionFolders, out credentialFolder);
+        var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.ResourceGroups[collection], out connectionFolders);
 
         foreach (var resource in resources) {
             if (resource.Details?.Accounts == null)
                 continue;
             foreach (var account in resource.Details.Accounts) {
                 var connection = RoyalJsonObject.CreateConnection(resource.Details, account);
-                if (connection != null) {
-                    foreach (var group in resource.Groups) {
-                        var folder = connectionFolders[group.Id];
-                        folder.AddChild(connection);
-                    }
-                    credentialFolder.AddChild(RoyalJsonObject.CreateDynamicCredential(resource.Details, account));
-                }
+                var credential = RoyalJsonObject.CreateDynamicCredential(resource.Details, account);
+                var group = resource.Groups.FirstOrDefault(g => !g.Name?.Equals("Default Group") ?? true);
+                var folder = (group != null) ? connectionFolders[group.Id] : root;
+                if (connection != null) folder.AddChild(connection);
+                if (credential != null) folder.AddChild(credential);
             }
         }
+        root.PurgeEmptyFoldersRecursive();
         return root;
     }
 
