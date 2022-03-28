@@ -99,6 +99,7 @@ public class ResourceDetails {
     public IEnumerable<CustomField> CustomFields { get; }
 
     [JsonPropertyName("ACCOUNT LIST")]
+    [JsonConverter(typeof(ResourceAccountListJsonConverter))]
     public IEnumerable<Account> Accounts { get; }
 
 }

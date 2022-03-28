@@ -1,0 +1,25 @@
+{
+    "operation":  {
+                      "result":  {
+                                     "message":  "Resource details with account list fetched successfully",
+                                     "status":  "Success"
+                                 },
+                      "Details":  {
+                                      "LOCATION":  "N/A",
+                                      "RESOURCE DESCRIPTION":  "N/A",
+                                      "RESOURCE TYPE":  "Key Store",
+                                      "RESOURCE ID":  "550",
+                                      "ACCOUNT LIST":  "",
+                                      "DEPARTMENT":  "N/A",
+                                      "RESOURCE OWNER":  "xxxx",
+                                      "RESOURCE PASSWORD POLICY":  "Strong",
+                                      "RESOURCE URL":  "N/A",
+                                      "NEWSSHTERMINAL":  "false",
+                                      "DOMAIN NAME":  "",
+                                      "ALLOWOPENURLINBROWSER":  "true",
+                                      "RESOURCE NAME":  "uuuuu",
+                                      "DNS NAME":  "zzzz"
+                                  },
+                      "name":  "GET RESOURCE ACCOUNTLIST"
+                  }
+}

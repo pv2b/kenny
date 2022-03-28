@@ -68,4 +68,11 @@ public class UnitTest1
         Assert.Equal(301, groups[0].Id);
         Assert.Equal("Default Group", groups[0].Name);
     }
+
+    [Fact]
+    public async void TestAccountListAsEmptyString()
+    {
+        ResourceDetails resourceDetails = await PmpApiClient.GetResourceDetailsAsync("550");
+        Assert.Null(resourceDetails.Accounts);
+    }
 }

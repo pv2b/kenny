@@ -23,10 +23,13 @@ public class PmpApiClientMock : BasePmpApiClient {
     }
 
     override public Task<string> GetResourceDetailsJsonAsync(String resourceId) {
-        if (!resourceId.Equals("303")) {
-            throw new NotImplementedException();
+        if (resourceId.Equals("303")) {
+            return File.ReadAllTextAsync(@"json\accounts1.json");
         }
-        return File.ReadAllTextAsync(@"json\accounts1.json");
+        if (resourceId.Equals("550")) {
+            return File.ReadAllTextAsync(@"json\accounts2.json");
+        }
+        throw new NotImplementedException();
     }
 
     override public Task<string> GetAccountPasswordJsonAsync(string resourceId, string accountId, ApiRequest<PasswordRequestDetails> request) {
