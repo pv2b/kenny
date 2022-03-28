@@ -46,6 +46,7 @@ public class RoyalTsApiController : ControllerBase
             }
         }
         root.PurgeEmptyFoldersRecursive();
+        root.SortFolderRecursive();
         return root;
     }
 

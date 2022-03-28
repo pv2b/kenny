@@ -63,11 +63,11 @@ public class RoyalJsonObject {
         return CreateFolder(rg.Name, rg.Description);
     }
 
-    private void SortFolderTree() {
+    public void SortFolderRecursive() {
         if (Objects == null) return;
         Objects.Sort((a, b) => (a?.Name ?? string.Empty).CompareTo(b?.Name ?? string.Empty));
         foreach (var obj in Objects) {
-            obj.SortFolderTree();
+            obj.SortFolderRecursive();
         }
     }
 
@@ -83,7 +83,6 @@ public class RoyalJsonObject {
             parentFolder.AddChild(currentFolder);
         }
 
-        root.SortFolderTree();
         return root;
     }
 
