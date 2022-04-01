@@ -61,19 +61,23 @@ public class PmpCrawlerService : IHostedService, IDisposable
 
         foreach (string collection in collectionNames) {
             Console.WriteLine($"Crawling collection {collection} API...");
-            var pmpApiClient = _pmpApiService.CreateApiClient(collection);
-            var resourceFilePath = GetCollectionFilename("Resources", collection);
-            var resourceFileTempPath = $"{resourceFilePath}.tmp";
+            try {
+                var pmpApiClient = _pmpApiService.CreateApiClient(collection);
+                var resourceFilePath = GetCollectionFilename("Resources", collection);
+                var resourceFileTempPath = $"{resourceFilePath}.tmp";
 
-            List<Resource> resources = new List<Resource>();
-            await foreach (var resource in pmpApiClient.GetAllResourcesAsync()) {
-                resources.Add(resource);
+                List<Resource> resources = new List<Resource>();
+                await foreach (var resource in pmpApiClient.GetAllResourcesAsync()) {
+                    resources.Add(resource);
+                }
+                _cache.UpdateResources(collection, resources);
+                using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                    JsonSerializer.Serialize<List<Resource>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
+                }
+                File.Move(resourceFileTempPath, resourceFilePath, true);
+            } catch (Exception e) {
+                _logger.LogError($"Error crawling collection {collection} API", e);
             }
-            _cache.UpdateResources(collection, resources);
-            using (FileStream fs = File.Open(resourceFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                JsonSerializer.Serialize<List<Resource>>(fs, resources, new JsonSerializerOptions { WriteIndented = true });
-            }
-            File.Move(resourceFileTempPath, resourceFilePath, true);
         }
     }
 
@@ -82,19 +86,23 @@ public class PmpCrawlerService : IHostedService, IDisposable
 
         foreach (string collection in collectionNames) {
             Console.WriteLine($"Crawling collection {collection} SQL...");
-            var pmpSqlClient = _pmpApiService.CreateSqlClient(collection);
-            var rgFilePath = GetCollectionFilename("ResourceGroups", collection);
-            var rgFileTempPath = $"{rgFilePath}.tmp";
+            try {
+                var pmpSqlClient = _pmpApiService.CreateSqlClient(collection);
+                var rgFilePath = GetCollectionFilename("ResourceGroups", collection);
+                var rgFileTempPath = $"{rgFilePath}.tmp";
 
-            var rgs = new List<ResourceGroup>();
-            await foreach (var rg in pmpSqlClient.GetResourceGroupsAsync()) {
-                rgs.Add(rg);
+                var rgs = new List<ResourceGroup>();
+                await foreach (var rg in pmpSqlClient.GetResourceGroupsAsync()) {
+                    rgs.Add(rg);
+                }
+                _cache.UpdateResourceGroups(collection, rgs);
+                using (FileStream fs = File.Open(rgFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                    JsonSerializer.Serialize<List<ResourceGroup>>(fs, rgs, new JsonSerializerOptions { WriteIndented = true });
+                }
+                File.Move(rgFileTempPath, rgFilePath, true);
+            } catch (Exception e) {
+                _logger.LogError($"Error crawling collection {collection} SQL", e);
             }
-            _cache.UpdateResourceGroups(collection, rgs);
-            using (FileStream fs = File.Open(rgFileTempPath, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                JsonSerializer.Serialize<List<ResourceGroup>>(fs, rgs, new JsonSerializerOptions { WriteIndented = true });
-            }
-            File.Move(rgFileTempPath, rgFilePath, true);
         }
     }
 
@@ -114,6 +122,8 @@ public class PmpCrawlerService : IHostedService, IDisposable
             var sqlTask = CrawlSql();
             await apiTask;
             await sqlTask;
+        } catch (Exception e) {
+            _logger.LogError("Error crawling", e);
         } finally {
             _crawlRunning = 0;
             _logger.LogInformation("Pmp Crawler finished");
