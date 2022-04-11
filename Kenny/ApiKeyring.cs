@@ -9,7 +9,6 @@ public class ApiKeyring {
         public string? ApiBaseUri { get; set; }
         public string? ApiAuthToken { get; set; }
         public string? ConnectionString { get; set; }
-        public IEnumerable<ResourceGroupAce>? Acl { get; set; }
     }
     private Dictionary<string, Item> _keyring;
     private HttpClient _httpClient;
@@ -40,9 +39,5 @@ public class ApiKeyring {
 
     public IEnumerable<string> GetCollectionNames() {
         return _keyring.Keys;
-    }
-
-    public IEnumerable<ResourceGroupAce> GetAcl(string collection) {
-        return _keyring[collection].Acl ?? new List<ResourceGroupAce>();
     }
 }

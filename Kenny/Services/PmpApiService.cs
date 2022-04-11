@@ -19,21 +19,16 @@ public class PmpApiService {
     }
 
     public bool IsAuthorizedUser(ClaimsPrincipal user, string collection, Resource resource) {
-        var acl = ApiKeyring.GetAcl(collection);
-        if (acl == null) return false;
+        foreach (var rgsummary in resource.Groups) {
+            var rgs = _crawlerCache.GetResourceGroupDict(collection);
+            if (!rgs.ContainsKey(rgsummary.Id))
+                continue;
+            var rg = rgs[rgsummary.Id];
 
-        var rgsummary = resource.Groups.FirstOrDefault(g => !g.Name?.Equals("Default Group") ?? true);
-        if (rgsummary == null)
-            return false;
-
-        var rgs = _crawlerCache.GetResourceGroupDict(collection);
-        var rg = rgs[rgsummary.Id];
-
-        foreach (var ace in acl) {
-             var action = ace.Check(user, rg, rgs);
-             if (action == ResourceGroupAce.AceAction.ALLOW) return true;
-             if (action == ResourceGroupAce.AceAction.DENY) return false;
-         }
-         return false;
+            foreach (var agrp in rg.AllowGroups) {
+                if (user.IsInRole(agrp)) return true;
+            }
+        }
+        return false;
      }
 }

@@ -127,15 +127,10 @@ The file should look like this:
         "Contoso": {
           "ApiBaseUri": "https://pmpserver.contoso.com/",
           "ApiAuthToken": "SecureLuggage12345",
-          "AllowGroups": [ "CONTOSO\\Nice People", "CONTOSO\\Also Nice People" ],
-          "DenyGroups": [ "CONTOSO\\Naughty People", "CONTOSO\\Very Naughty People" ],
-          "AllowUsers": [ "CONTOSO\\goodguy1", "CONTOSO\\goodguy2" ],
-          "DenyUsers": [ "CONTOSO\\badguy1", "CONTOSO\\badguy2" ]
         },
         "Northwind": {
           "ApiBaseUri": "https://pmpserver.contoso.com/",
           "ApiAuthToken": "PasswordForAChocolateBar",
-          "DenyUsers": [ "NORTHWIND\\hackerman" ]
         }
       }
       /* 8<----- */
@@ -150,25 +145,6 @@ server.
 
 `ApiAuthToken` (mandatory) is the authentication token belinging to the
 Password Manager Pro API user.
-
-`AllowGroups` (optional) is a list of groups that are authorized to use this
-API key.
-
-`DenyGroups` (optional) is a list of groups that are authorized to use this
-API key.
-
-`AllowUsers` (optional) is a list of users that are authorized to use this
-API key.
-
-`DenyUsers` (optional) is a list of users that are authorized to use this
-API key.
-
-Deny takes precedence over allow. If both `AllowGroups` and `AllowUsers`
-are empty or missing, nobody is allowed in. (I.e. there's no default
-"allow all" behaviour.)
-
-Note that JSON requires backslashes to be escaped by doubling them inside
-strings.
 
 ## SQL Configuration
 
