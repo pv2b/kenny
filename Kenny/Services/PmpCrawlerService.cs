@@ -76,7 +76,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
                 }
                 File.Move(resourceFileTempPath, resourceFilePath, true);
             } catch (Exception e) {
-                _logger.LogError($"Error crawling collection {collection} API", e);
+                _logger.LogError(e, $"Error crawling collection {collection} API");
             }
         }
     }
@@ -101,7 +101,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
                 }
                 File.Move(rgFileTempPath, rgFilePath, true);
             } catch (Exception e) {
-                _logger.LogError($"Error crawling collection {collection} SQL", e);
+                _logger.LogError(e, $"Error crawling collection {collection} SQL");
             }
         }
     }
@@ -123,7 +123,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
             await apiTask;
             await sqlTask;
         } catch (Exception e) {
-            _logger.LogError("Error crawling", e);
+            _logger.LogError(e, "Error crawling");
         } finally {
             _crawlRunning = 0;
             _logger.LogInformation("Pmp Crawler finished");
