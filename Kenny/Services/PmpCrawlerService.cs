@@ -6,15 +6,15 @@ using System.Text.Json;
 public class PmpCrawlerService : IHostedService, IDisposable
 {
     private readonly ILogger<PmpCrawlerService> _logger;
-    private readonly PmpApiService _pmpApiService;
+    private readonly ApiKeyring _apiKeyring;
     private Timer _timer = null!;
     private uint _crawlRunning = 0;
     private CrawlerCache _cache;
 
-    public PmpCrawlerService(ILogger<PmpCrawlerService> logger, PmpApiService pmpApiService, CrawlerCache cache)
+    public PmpCrawlerService(ILogger<PmpCrawlerService> logger, ApiKeyring apiKeyring, CrawlerCache cache)
     {
         _logger = logger;
-        _pmpApiService = pmpApiService;
+        _apiKeyring = apiKeyring;
         _cache = cache;
     }
 
@@ -26,7 +26,7 @@ public class PmpCrawlerService : IHostedService, IDisposable
     {
         _logger.LogInformation("Timed Hosted Service running.");
 
-        var collectionNames = _pmpApiService.ApiKeyring.GetCollectionNames();
+        var collectionNames = _apiKeyring.GetCollectionNames();
 
         foreach (string collection in collectionNames) {
             string resourcesFile = GetCollectionFilename("Resources", collection);
@@ -57,12 +57,12 @@ public class PmpCrawlerService : IHostedService, IDisposable
     }
 
     private async Task CrawlApi() {
-        var collectionNames = _pmpApiService.ApiKeyring.GetCollectionNames();
+        var collectionNames = _apiKeyring.GetCollectionNames();
 
         foreach (string collection in collectionNames) {
             Console.WriteLine($"Crawling collection {collection} API...");
             try {
-                var pmpApiClient = _pmpApiService.CreateApiClient(collection);
+                var pmpApiClient = _apiKeyring.CreateApiClient(collection);
                 var resourceFilePath = GetCollectionFilename("Resources", collection);
                 var resourceFileTempPath = $"{resourceFilePath}.tmp";
 
@@ -82,12 +82,12 @@ public class PmpCrawlerService : IHostedService, IDisposable
     }
 
     private async Task CrawlSql() {
-        var collectionNames = _pmpApiService.ApiKeyring.GetCollectionNames();
+        var collectionNames = _apiKeyring.GetCollectionNames();
 
         foreach (string collection in collectionNames) {
             Console.WriteLine($"Crawling collection {collection} SQL...");
             try {
-                var pmpSqlClient = _pmpApiService.CreateSqlClient(collection);
+                var pmpSqlClient = _apiKeyring.CreateSqlClient(collection);
                 var rgFilePath = GetCollectionFilename("ResourceGroups", collection);
                 var rgFileTempPath = $"{rgFilePath}.tmp";
 

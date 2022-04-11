@@ -9,16 +9,31 @@ namespace Kenny.Controllers;
 [Route("")]
 public class RoyalTsApiController : ControllerBase
 {
+    private ApiKeyring _apiKeyring;
     private readonly ILogger<RoyalTsApiController> _logger;
-    private readonly PmpApiService _pmpApiService;
     private readonly CrawlerCache _crawlerCache;
 
-    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, PmpApiService pmpApiService, CrawlerCache crawlerCache)
+    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, CrawlerCache crawlerCache, ApiKeyring apiKeyring)
     {
         _logger = logger;
-        _pmpApiService = pmpApiService;
         _crawlerCache = crawlerCache;
+        _apiKeyring = apiKeyring;
     }
+
+    public bool IsAuthorizedUser(string collection, Resource resource) {
+        foreach (var rgsummary in resource.Groups) {
+            var rgs = _crawlerCache.GetResourceGroupDict(collection);
+            if (!rgs.ContainsKey(rgsummary.Id))
+                continue;
+            var rg = rgs[rgsummary.Id];
+
+            foreach (var agrp in rg.AllowGroups) {
+                if (HttpContext.User.IsInRole(agrp)) return true;
+            }
+        }
+        return false;
+    }
+
     
     [HttpGet("DynamicFolder")]
     public Object GetDynamicFolder(string collection)
@@ -31,7 +46,7 @@ public class RoyalTsApiController : ControllerBase
         var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.GetResourceGroupList(collection), out connectionFolders);
 
         foreach (var resource in resources) {
-            if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection, resource))
+            if (!IsAuthorizedUser(collection, resource))
                 continue;
             if (resource.Details?.Accounts == null)
                 continue;
@@ -54,9 +69,9 @@ public class RoyalTsApiController : ControllerBase
     {
         var pmpCredentialId = new PmpCredentialId(dynamicCredentialId);
         var resource = _crawlerCache.GetResource(collection, pmpCredentialId.ResourceId);
-        if (!_pmpApiService.IsAuthorizedUser(HttpContext.User, collection, resource))
+        if (!IsAuthorizedUser(collection, resource))
             throw new UnauthorizedAccessException();
-        var pmpApi = _pmpApiService.CreateApiClient(collection);
+        var pmpApi = _apiKeyring.CreateApiClient(collection);
         string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
         var accountPassword = await pmpApi.GetAccountPasswordAsync(pmpCredentialId.ResourceId, pmpCredentialId.AccountId, reason);
         return new {

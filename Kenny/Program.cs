@@ -40,7 +40,6 @@ builder.Services.AddHttpClient<ApiKeyring, ApiKeyring>()
             .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
     );
 builder.Services.AddSingleton<ApiKeyring, ApiKeyring>();
-builder.Services.AddSingleton<PmpApiService, PmpApiService>();
 builder.Services.AddSingleton<CrawlerCache, CrawlerCache>();
 builder.Services.AddHostedService<PmpCrawlerService>();
 
