@@ -9,20 +9,20 @@ namespace Kenny.Controllers;
 [Route("")]
 public class RoyalTsApiController : ControllerBase
 {
-    private ApiKeyring _apiKeyring;
+    private PmpApiFactory _apiKeyring;
     private readonly ILogger<RoyalTsApiController> _logger;
     private readonly CrawlerCache _crawlerCache;
 
-    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, CrawlerCache crawlerCache, ApiKeyring apiKeyring)
+    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, CrawlerCache crawlerCache, PmpApiFactory apiKeyring)
     {
         _logger = logger;
         _crawlerCache = crawlerCache;
         _apiKeyring = apiKeyring;
     }
 
-    public bool IsAuthorizedUser(string collection, Resource resource) {
+    public bool IsAuthorizedUser(Resource resource) {
         foreach (var rgsummary in resource.Groups) {
-            var rgs = _crawlerCache.GetResourceGroupDict(collection);
+            var rgs = _crawlerCache.GetResourceGroupDict();
             if (!rgs.ContainsKey(rgsummary.Id))
                 continue;
             var rg = rgs[rgsummary.Id];
@@ -36,17 +36,17 @@ public class RoyalTsApiController : ControllerBase
 
     
     [HttpGet("DynamicFolder")]
-    public Object GetDynamicFolder(string collection)
+    public Object GetDynamicFolder()
     {
-        IEnumerable<Resource>? resources = _crawlerCache.GetResourceList(collection);
+        IEnumerable<Resource>? resources = _crawlerCache.GetResourceList();
         if (resources == null) {
             throw new Exception("Resources is null!");
         }
         Dictionary<long, RoyalJsonObject> connectionFolders;
-        var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.GetResourceGroupList(collection), out connectionFolders);
+        var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.GetResourceGroupList(), out connectionFolders);
 
         foreach (var resource in resources) {
-            if (!IsAuthorizedUser(collection, resource))
+            if (!IsAuthorizedUser(resource))
                 continue;
             if (resource.Details?.Accounts == null)
                 continue;
@@ -65,13 +65,13 @@ public class RoyalTsApiController : ControllerBase
     }
 
     [HttpGet("DynamicCredential")]
-    public async Task<Object> GetDynamicCredential(string collection, string dynamicCredentialId)
+    public async Task<Object> GetDynamicCredential(string dynamicCredentialId)
     {
         var pmpCredentialId = new PmpCredentialId(dynamicCredentialId);
-        var resource = _crawlerCache.GetResource(collection, pmpCredentialId.ResourceId);
-        if (!IsAuthorizedUser(collection, resource))
+        var resource = _crawlerCache.GetResource(pmpCredentialId.ResourceId);
+        if (!IsAuthorizedUser(resource))
             throw new UnauthorizedAccessException();
-        var pmpApi = _apiKeyring.CreateApiClient(collection);
+        var pmpApi = _apiKeyring.CreateApiClient();
         string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
         var accountPassword = await pmpApi.GetAccountPasswordAsync(pmpCredentialId.ResourceId, pmpCredentialId.AccountId, reason);
         return new {

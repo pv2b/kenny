@@ -124,21 +124,11 @@ The file should look like this:
     {
       /* 8<----- */
       "PmpApi": {
-        "Contoso": {
-          "ApiBaseUri": "https://pmpserver.contoso.com/",
-          "ApiAuthToken": "SecureLuggage12345",
-        },
-        "Northwind": {
-          "ApiBaseUri": "https://pmpserver.contoso.com/",
-          "ApiAuthToken": "PasswordForAChocolateBar",
-        }
+        "ApiBaseUri": "https://pmpserver.contoso.com/",
+        "ApiAuthToken": "SecureLuggage12345"
       }
       /* 8<----- */
     }
-    
-The keys under `PmpApi` correspond to the `collection` parameter on the API
-calls. This is used to determine what API Key (`AuthToken`) from the keyring
-is to be used for that collection.
 
 `ApiBaseUri` (mandatory) determines the location of the Password Manager Pro
 server.
@@ -164,14 +154,13 @@ Add a dynamic folder with the following Dynamic Folder Script (Powershell):
 
     $ProgressPreference = 'SilentlyContinue'
     [System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri https://kenny.contoso.com:5000/DynamicFolder?collection=contoso).Content
+    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri https://kenny.contoso.com:5000/DynamicFolder).Content
 
 ... and the following Dynamic Credential Script (Powershell):
 
     $ProgressPreference = 'SilentlyContinue'
     [System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
     $credid = '$DynamicCredential.EffectiveID$'
-    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?collection=contoso&dynamicCredentialId=$credid").Content
+    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?dynamicCredentialId=$credid").Content
 
-You will need to edit the script to edit the hostname of the Kenny server and
-the collection name.
+You will need to edit the script to edit the hostname of the Kenny server.

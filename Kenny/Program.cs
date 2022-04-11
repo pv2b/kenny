@@ -26,7 +26,7 @@ builder.Services.AddControllers().AddJsonOptions(j => {
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHttpClient<ApiKeyring, ApiKeyring>()
+builder.Services.AddHttpClient<PmpApiFactory, PmpApiFactory>()
     .ConfigurePrimaryHttpMessageHandler(sp => 
         new SocketsHttpHandler() {
             MaxConnectionsPerServer = 4
@@ -39,7 +39,7 @@ builder.Services.AddHttpClient<ApiKeyring, ApiKeyring>()
             //.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
             .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
     );
-builder.Services.AddSingleton<ApiKeyring, ApiKeyring>();
+builder.Services.AddSingleton<PmpApiFactory, PmpApiFactory>();
 builder.Services.AddSingleton<CrawlerCache, CrawlerCache>();
 builder.Services.AddHostedService<PmpCrawlerService>();
 
