@@ -36,10 +36,12 @@ public class RoyalTsApiController : ControllerBase
             if (resource.Details?.Accounts == null)
                 continue;
             foreach (var account in resource.Details.Accounts) {
-                var credential = RoyalJsonObject.CreateDynamicCredential(resource.Details, account);
-                var group = resource.Groups.FirstOrDefault(g => !g.Name?.Equals("Default Group") ?? true);
-                var folder = (group != null) ? connectionFolders[group.Id] : root;
-                if (credential != null) folder.AddChild(credential);
+                foreach (var group in resource.Groups) {
+                    if (group != null && connectionFolders.ContainsKey(group.Id)) {
+                        var credential = RoyalJsonObject.CreateDynamicCredential(group, resource.Details, account);
+                        connectionFolders[group.Id].AddChild(credential);
+                    }
+                }
             }
         }
         root.PurgeEmptyFoldersRecursive();

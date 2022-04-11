@@ -13,11 +13,11 @@ public class RoyalJsonObject {
     public string? Username { get; set; }
     public List<RoyalJsonObject>? Objects { get; set; }
 
-    public static RoyalJsonObject CreateDynamicCredential(ResourceDetails resource, ResourceDetails.Account account) {
+    public static RoyalJsonObject CreateDynamicCredential(ResourceGroupSummary resourceGroup, ResourceDetails resource, ResourceDetails.Account account) {
         var o = new RoyalJsonObject();
         o.Type="DynamicCredential";
         o.Name=$"Cred {resource.Name} ({account.Name})";
-        o.Id=new PmpCredentialId(resource.Id, account.Id).ToString();
+        o.Id=new PmpCredentialId($"{resourceGroup.Id}", resource.Id, account.Id).ToString();
         o.Username=account.Name;
         return o;
     }
