@@ -23,19 +23,27 @@ public class RoyalTsApiController : ControllerBase
 
     public bool IsAuthorizedUser(Resource resource) {
         foreach (var rgsummary in resource.Groups) {
-            ResourceGroup rg;
-            try {
-                rg = _crawlerCache.GetResourceGroup(rgsummary.Id);
-            } catch (KeyNotFoundException) {
-                continue;
-            }
-            foreach (var agrp in rg.AllowGroups) {
-                if (HttpContext.User.IsInRole(agrp)) return true;
-            }
+            if (IsAuthorizedUser(rgsummary)) return true;
         }
         return false;
     }
 
+    public bool IsAuthorizedUser(ResourceGroupSummary rgs) {
+        ResourceGroup rg;
+        try {
+            rg = _crawlerCache.GetResourceGroup(rgs.Id);
+        } catch (KeyNotFoundException) {
+            return false;
+        }
+        return IsAuthorizedUser(rg);
+    }
+
+    public bool IsAuthorizedUser(ResourceGroup rg) {
+        foreach (var agrp in rg.AllowGroups) {
+            if (HttpContext.User.IsInRole(agrp)) return true;
+        }
+        return false;
+    }
     
     [HttpGet("DynamicFolder")]
     public Object GetDynamicFolder()
@@ -48,13 +56,11 @@ public class RoyalTsApiController : ControllerBase
         var root = RoyalJsonObject.CreateFolderTree(_crawlerCache.GetResourceGroupList(), out connectionFolders);
 
         foreach (var resource in resources) {
-            if (!IsAuthorizedUser(resource))
-                continue;
             if (resource.Details?.Accounts == null)
                 continue;
             foreach (var account in resource.Details.Accounts) {
                 foreach (var group in resource.Groups) {
-                    if (group != null && connectionFolders.ContainsKey(group.Id)) {
+                    if (group != null && IsAuthorizedUser(group) && connectionFolders.ContainsKey(group.Id)) {
                         var credential = RoyalJsonObject.CreateDynamicCredential(group, resource.Details, account);
                         connectionFolders[group.Id].AddChild(credential);
                     }
