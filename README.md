@@ -114,10 +114,12 @@ The following Powershell snippet will set the appopriate file permissions and cr
 
     New-Service -Name "Kenny" -BinaryPathName (Join-Path $app_path "Kenny.exe") -Credential $service_user -Description "Kenny integrates Royal TS with Password Manager Pro" -DisplayName "Kenny" -StartupType Automatic
 
-### Add API keys and authorize them
+### Add API keys and SQL connection strung
 
 Adding API keys happens by editing the `PmpApi` property of the
 `appsettings.json` file in the C:\Kenny`. folder (or wherever Kenny has been installed.)
+
+Configure the SQL server connection string in `appsettings.json` as per the example below.
 
 The file should look like this:
 
@@ -126,6 +128,7 @@ The file should look like this:
       "PmpApi": {
         "ApiBaseUri": "https://pmpserver.contoso.com/",
         "ApiAuthToken": "SecureLuggage12345"
+        "ConnectionString": "Data Source=DSPMP-DB04\\PMP;Persist Security Info=False;Initial Catalog=PassTrix;Integrated Security=true"
       }
       /* 8<----- */
     }
@@ -135,18 +138,6 @@ server.
 
 `ApiAuthToken` (mandatory) is the authentication token belinging to the
 Password Manager Pro API user.
-
-## SQL Configuration
-
-Configure the SQL server connection string in `appsettings.json` as per the example below:
-
-    {
-      /* 8<----- */
-      "PmpSql": {
-        "ConnectionString": "Data Source=DSPMP-DB04\\PMP;Persist Security Info=False;Initial Catalog=PassTrix;Integrated Security=true"
-      }
-      /* 8<----- */
-    }
 
 ## Royal TS Configuration
 
