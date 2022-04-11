@@ -13,34 +13,6 @@ public class RoyalJsonObject {
     public string? Username { get; set; }
     public List<RoyalJsonObject>? Objects { get; set; }
 
-    public static RoyalJsonObject? CreateConnection(ResourceDetails resource, ResourceDetails.Account account) {
-        /* skip objects that contain no DNS name because we'll never be able to connect to them or do anything useful with them */
-        if (string.IsNullOrWhiteSpace(resource.DnsName) || resource.DnsName.Equals("N/A"))
-            return null;
-        var o = new RoyalJsonObject();
-        switch(resource.Type) {
-            case "Windows":
-                o.Type = "RemoteDesktopConnection";
-                o.Name = $"RDP {resource.Name} ({account.Name})";
-                break;
-
-            case "Linux":
-                o.Type = "TerminalConnection";
-                o.TerminalConnectionType = "SSH";
-                o.Name = $"SSH {resource.Name} ({account.Name})";
-                break;
-
-            default:
-                return null;
-        }
-
-        o.ComputerName = resource.DnsName;
-        o.CredentialId = new PmpCredentialId(resource.Id, account.Id).ToString();
-        o.Description = resource.Description;
-
-        return o;
-    }
-
     public static RoyalJsonObject CreateDynamicCredential(ResourceDetails resource, ResourceDetails.Account account) {
         var o = new RoyalJsonObject();
         o.Type="DynamicCredential";
