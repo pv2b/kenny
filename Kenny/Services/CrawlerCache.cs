@@ -1,36 +1,36 @@
 using PmpApiClient;
 using PmpSqlClient;
 public class CrawlerCache {
-    public Dictionary<string, Resource> ResourcesDict;
-    public Dictionary<long, ResourceGroup> ResourceGroupsDict;
+    private Dictionary<string, Resource> Resources;
+    private Dictionary<long, ResourceGroup> ResourceGroups;
 
     public CrawlerCache() {
-        ResourcesDict = new Dictionary<string, Resource>();
-        ResourceGroupsDict = new Dictionary<long, ResourceGroup>();
+        Resources = new Dictionary<string, Resource>();
+        ResourceGroups = new Dictionary<long, ResourceGroup>();
     }
 
     public Resource GetResource(string resourceId) {
-        return ResourcesDict[resourceId];
+        return Resources[resourceId];
+    }
+
+    public ResourceGroup GetResourceGroup(long resourceGroupId) {
+        return ResourceGroups[resourceGroupId];
     }
 
     public IEnumerable<Resource> GetResourceList() {
-        return ResourcesDict.Values;
+        return Resources.Values;
     }
 
     public IEnumerable<ResourceGroup> GetResourceGroupList() {
-        return ResourceGroupsDict.Values;
+        return ResourceGroups.Values;
     }
-    
-    public IDictionary<long, ResourceGroup> GetResourceGroupDict() {
-        return ResourceGroupsDict;
-    }    
 
     public void UpdateResources(List<Resource> resources) {
         var d = new Dictionary<string, Resource>();
         foreach (var resource in resources) {
             d[resource.Summary.Id] = resource;
         }
-        ResourcesDict = d;
+        Resources = d;
     }
 
     public void UpdateResourceGroups(List<ResourceGroup> resourceGroups) {
@@ -38,6 +38,6 @@ public class CrawlerCache {
         foreach (var rg in resourceGroups) {
             d[rg.Id] = rg;
         }
-        ResourceGroupsDict = d;
+        ResourceGroups = d;
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PmpApiClient;
+using PmpSqlClient;
 using System.Text.Json;
 using System.IO;
 
@@ -22,11 +23,12 @@ public class RoyalTsApiController : ControllerBase
 
     public bool IsAuthorizedUser(Resource resource) {
         foreach (var rgsummary in resource.Groups) {
-            var rgs = _crawlerCache.GetResourceGroupDict();
-            if (!rgs.ContainsKey(rgsummary.Id))
+            ResourceGroup rg;
+            try {
+                rg = _crawlerCache.GetResourceGroup(rgsummary.Id);
+            } catch (KeyNotFoundException) {
                 continue;
-            var rg = rgs[rgsummary.Id];
-
+            }
             foreach (var agrp in rg.AllowGroups) {
                 if (HttpContext.User.IsInRole(agrp)) return true;
             }
