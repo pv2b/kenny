@@ -139,6 +139,22 @@ server.
 `ApiAuthToken` (mandatory) is the authentication token belinging to the
 Password Manager Pro API user.
 
+### Royal TS Credential Namespace GUID
+
+In order to allow for credentials to be consistently mapped from Royal TS, ever credential needs a GUID. For the GUIDs to be unchanging as long as the resource ID and account ID remaing unchanging, we use version 5 GUIDS.
+
+As part of the GUID calculation, a "namespace GUID" needs to be given which is unique and consistent for any deployment of Kenny.
+
+Generate a random version 4 GUID using your favorite tool and then configure it like this in `appsettings.json`:
+
+    {
+      /* 8<----- */
+      "RoyalTSNamespaceGuid": "ef862229-bc78-4ac7-b3a9-24a72d1ef538"
+      /* 8<----- */
+    }
+
+N.B. Do not use this sample GUID unless you want to blindly collide with everyone else who didn't change from the sample GUID.
+
 ## Royal TS Configuration
 
 Add a dynamic folder with the following Dynamic Folder Script (Powershell):
@@ -151,7 +167,8 @@ Add a dynamic folder with the following Dynamic Folder Script (Powershell):
 
     $ProgressPreference = 'SilentlyContinue'
     [System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-    $credid = '$DynamicCredential.EffectiveID$'
-    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?dynamicCredentialId=$credid").Content
+    $r = '$DynamicCredential.CustomField1$'
+    $c = '$DynamicCredential.CustomField2$'
+    (Invoke-WebRequest -UseDefaultCredentials -Method Get -Uri "https://kenny.contoso.com:5000/DynamicCredential?resourceId=$r&accountId=$c").Content
 
 You will need to edit the script to edit the hostname of the Kenny server.

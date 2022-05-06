@@ -13,12 +13,14 @@ public class RoyalTsApiController : ControllerBase
     private PmpApiFactory _apiKeyring;
     private readonly ILogger<RoyalTsApiController> _logger;
     private readonly CrawlerCache _crawlerCache;
+    private readonly Guid _royalTSNamespaceGuid;
 
-    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, CrawlerCache crawlerCache, PmpApiFactory apiKeyring)
+    public RoyalTsApiController(ILogger<RoyalTsApiController> logger, CrawlerCache crawlerCache, PmpApiFactory apiKeyring, IConfiguration config)
     {
         _logger = logger;
         _crawlerCache = crawlerCache;
         _apiKeyring = apiKeyring;
+        _royalTSNamespaceGuid = config.GetValue<Guid>("RoyalTSNamespaceGuid");
     }
 
     public bool IsAuthorizedUser(Resource resource) {
@@ -61,7 +63,7 @@ public class RoyalTsApiController : ControllerBase
             foreach (var account in resource.Details.Accounts) {
                 foreach (var group in resource.Groups) {
                     if (group != null && IsAuthorizedUser(group) && connectionFolders.ContainsKey(group.Id)) {
-                        var credential = RoyalJsonObject.CreateDynamicCredential(group, resource.Details, account);
+                        var credential = RoyalJsonObject.CreateDynamicCredential(_royalTSNamespaceGuid, group, resource.Details, account);
                         connectionFolders[group.Id].AddChild(credential);
                     }
                 }
@@ -73,15 +75,14 @@ public class RoyalTsApiController : ControllerBase
     }
 
     [HttpGet("DynamicCredential")]
-    public async Task<Object> GetDynamicCredential(string dynamicCredentialId)
+    public async Task<Object> GetDynamicCredential(string resourceId, string accountId)
     {
-        var pmpCredentialId = new PmpCredentialId(dynamicCredentialId);
-        var resource = _crawlerCache.GetResource(pmpCredentialId.ResourceId);
+        var resource = _crawlerCache.GetResource(resourceId);
         if (!IsAuthorizedUser(resource))
             throw new UnauthorizedAccessException();
         var pmpApi = _apiKeyring.CreateApiClient();
         string reason = $"Requested through kenny by {HttpContext.User.Identity?.Name ?? "unknown user"}";
-        var accountPassword = await pmpApi.GetAccountPasswordAsync(pmpCredentialId.ResourceId, pmpCredentialId.AccountId, reason);
+        var accountPassword = await pmpApi.GetAccountPasswordAsync(resourceId, accountId, reason);
         return new {
             Password = accountPassword.Password
         };

@@ -1,5 +1,6 @@
 using PmpApiClient;
 using PmpSqlClient;
+using Faithlife.Utility;
 
 public class RoyalJsonObject {
     public string? Type { get; set; }
@@ -11,13 +12,18 @@ public class RoyalJsonObject {
     public string? TerminalConnectionType { get; set; }
     public string? Id { get; set; }
     public string? Username { get; set; }
+    public string? CustomField1 { get; set; }
+    public string? CustomField2 { get; set; }
     public List<RoyalJsonObject>? Objects { get; set; }
 
-    public static RoyalJsonObject CreateDynamicCredential(ResourceGroupSummary resourceGroup, ResourceDetails resource, ResourceDetails.Account account) {
+    public static RoyalJsonObject CreateDynamicCredential(Guid royalTSNamespaceGuid, ResourceGroupSummary resourceGroup, ResourceDetails resource, ResourceDetails.Account account) {
         var o = new RoyalJsonObject();
         o.Type="DynamicCredential";
         o.Name=$"Cred {resource.Name} ({account.Name})";
-        o.Id=new PmpCredentialId($"{resourceGroup.Id}", resource.Id, account.Id).ToString();
+        var pmpCredentialId = new PmpCredentialId($"{resourceGroup.Id}", resource.Id, account.Id).ToString();
+        o.Id = Faithlife.Utility.GuidUtility.Create(royalTSNamespaceGuid, pmpCredentialId).ToString();
+        o.CustomField1 = resource.Id;
+        o.CustomField2 = account.Id;
         o.Username=account.Name;
         return o;
     }
